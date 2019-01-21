@@ -1,0 +1,7 @@
+{
+  "name": "ddb_test-get-blogposts-000blogpost",
+  "dependencies": {
+    "@architect/data": "^2.0.9",
+    "@architect/functions": "^1.12.1"
+  }
+}
