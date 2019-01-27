@@ -15,9 +15,11 @@ get /admin
 get /api/posts
 get /api/posts/:uid
 get /api/categories
+get /import
 
 post /api/posts
 post /api/categories
+post /import
 
 put /api/posts/:uid
 put /api/categories/:uid

@@ -1,0 +1,11 @@
+{
+  "name": "blog-post-import",
+  "dependencies": {
+    "@architect/data": "^2.0.13",
+    "@architect/functions": "^1.12.1",
+    "frontmatter": "0.0.3",
+    "globby": "^9.0.0",
+    "shortid": "^2.2.14",
+    "unzip": "^0.1.11"
+  }
+}
