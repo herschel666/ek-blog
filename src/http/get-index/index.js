@@ -105,7 +105,7 @@ const getLastEvaluatedKey = async (offset) => {
 };
 
 const getBlogpostCount = async () => {
-  const { Count: count } = await await data.blog.query({
+  const { Count: count } = await data.blog.query({
     KeyConditionExpression: 'kind = :kind',
     ProjectionExpression: 'uid',
     ExpressionAttributeValues: {
