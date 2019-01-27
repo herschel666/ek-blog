@@ -1,0 +1,9 @@
+{
+  "name": "blog-post-api-media",
+  "dependencies": {
+    "@architect/data": "^2.0.13",
+    "@architect/functions": "^1.12.1",
+    "file-type": "^10.7.1",
+    "shortid": "^2.2.14"
+  }
+}
