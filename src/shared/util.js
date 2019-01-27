@@ -1,3 +1,4 @@
+const arc = require('@architect/functions');
 const slugify = require('slugify');
 
 slugify.extend({
@@ -9,6 +10,7 @@ slugify.extend({
   Ä: 'Ae',
   ß: 'ss',
   '/': '-',
+  '!': '',
 });
 
 const pad = (num = 0, str = String(num)) => {
@@ -28,3 +30,5 @@ exports.getNiceDate = (dateStr) => {
 };
 
 exports.slugify = slugify;
+
+exports.assets = (filename) => arc.http.helpers.url(`/assets/${filename}`);

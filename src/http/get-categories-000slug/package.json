@@ -1,0 +1,7 @@
+{
+  "name": "blog-get-categories-000slug",
+  "dependencies": {
+    "@architect/data": "^2.0.9",
+    "@architect/functions": "^1.12.1"
+  }
+}

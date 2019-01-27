@@ -1,0 +1,8 @@
+{
+  "name": "blog-post-api-categories",
+  "dependencies": {
+    "@architect/data": "^2.0.9",
+    "@architect/functions": "^1.12.1",
+    "shortid": "^2.2.14"
+  }
+}

@@ -1,7 +1,0 @@
-{
-  "name": "ddb_test-get-categories-000category",
-  "dependencies": {
-    "@architect/data": "^2.0.9",
-    "@architect/functions": "^1.12.1"
-  }
-}

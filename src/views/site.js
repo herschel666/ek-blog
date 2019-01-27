@@ -6,7 +6,7 @@ module.exports = (content) => html`
     <head>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <title>DDB-Test</title>
+      <title>Blog</title>
       <style>
         .site-header {
           padding-bottom: 1em;
@@ -20,7 +20,7 @@ module.exports = (content) => html`
     </head>
     <body>
       <header class="site-header">
-        <span class="site-title"><a href="/">DDB Test</a></span>
+        <span class="site-title"><a href="/">Blog</a></span>
       </header>
       ${content}
     </body>

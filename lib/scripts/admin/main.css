@@ -1,0 +1,13 @@
+body {
+  padding: 1em;
+}
+
+.site-header {
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  border-bottom: 2px solid grey;
+}
+
+.site-title {
+  font-size: 2em;
+}

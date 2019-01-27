@@ -1,25 +1,36 @@
 @app
-ddb_test
+blog
 
 @aws
 region eu-central-1
-profile ddb_test
+profile blog
 
 @http
 get /
-get /blogposts/:blogpost
+get /posts/:slug
 get /categories
-get /categories/:category
+get /categories/:slug
+get /assets/:file
+get /admin
+get /api/posts
+get /api/posts/:uid
+get /api/categories
 
-post /create/blogpost
-post /create/category
+post /api/posts
+post /api/categories
+
+put /api/posts/:uid
+put /api/categories/:uid
+
+delete /api/posts/:uid
+delete /api/categories/:uid
 
 @tables
-ddb_data
+blog
   kind *String
   createdAt **String
 
 @indexes
-ddb_data
+blog
   kind *String
   params **String

@@ -1,0 +1,7 @@
+{
+  "name": "blog-get-api-posts-000uid",
+  "dependencies": {
+    "@architect/data": "^2.0.12",
+    "@architect/functions": "^1.12.1"
+  }
+}
