@@ -11,7 +11,6 @@ get /posts/:slug
 get /categories
 get /categories/:slug
 get /assets/:file
-get /media/:file
 get /admin
 get /api/posts
 get /api/posts/:uid

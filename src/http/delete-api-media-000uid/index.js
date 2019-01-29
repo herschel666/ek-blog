@@ -7,17 +7,17 @@ class NoUidError extends Error {}
 
 const getMeta = async (uid) => {
   const {
-    Items: [{ ext, createdAt } = {}],
+    Items: [{ filename, createdAt } = {}],
   } = await data.blog.query({
     KeyConditionExpression: 'kind = :kind',
-    ProjectionExpression: 'uid, ext, createdAt',
+    ProjectionExpression: 'filename, createdAt',
     FilterExpression: 'uid = :uid',
     ExpressionAttributeValues: {
       ':kind': 'media',
       ':uid': uid,
     },
   });
-  return { ext, createdAt };
+  return { filename, createdAt };
 };
 
 const unlink = promisify(fs.unlink);
@@ -31,8 +31,7 @@ exports.handler = async (req) => {
       throw NoUidError();
     }
 
-    const { ext, createdAt } = await getMeta(req.params.uid);
-    const filename = `${req.params.uid}.${ext}`;
+    const { filename, createdAt } = await getMeta(req.params.uid);
     await Promise.all([
       data.blog.delete({
         kind: 'media',

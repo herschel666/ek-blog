@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "clean:media": "rm -rf ./public/media/*.{png,gif,jpg}"
   },
   "keywords": [],
   "author": "Emanuel Kluge",

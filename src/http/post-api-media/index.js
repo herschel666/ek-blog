@@ -4,18 +4,28 @@ const { promisify } = require('util');
 const data = require('@architect/data');
 const fileType = require('file-type');
 const shortid = require('shortid');
+const md5 = require('md5');
 
 const writeFile = promisify(fs.writeFile);
 
 exports.handler = async (req) => {
+  const { image, description } = req.body;
+
   console.log();
-  console.log(req);
+  console.log(
+    Object.assign(req, {
+      body: {
+        image: image.substring(0, 32),
+        description,
+      },
+    })
+  );
 
   try {
-    const imageBuffer = new Buffer(req.body.image, 'base64');
+    const imageBuffer = new Buffer(image, 'base64');
     const { ext } = fileType(imageBuffer);
     const uid = `m${shortid.generate()}`;
-    const filename = `${uid}.${ext}`;
+    const filename = `${md5(imageBuffer)}.${ext}`;
     const createdAt = new Date().toISOString();
 
     await Promise.all([
@@ -26,6 +36,8 @@ exports.handler = async (req) => {
       data.blog.put({
         kind: 'media',
         createdAt,
+        filename,
+        description,
         uid,
         ext,
       }),

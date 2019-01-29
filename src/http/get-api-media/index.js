@@ -9,7 +9,7 @@ exports.handler = async (req) => {
   try {
     const { Items: media } = await data.blog.query({
       KeyConditionExpression: 'kind = :kind',
-      ProjectionExpression: 'uid, ext',
+      ProjectionExpression: 'uid, filename, description',
       ExpressionAttributeValues: {
         ':kind': 'media',
       },
@@ -18,8 +18,9 @@ exports.handler = async (req) => {
     return {
       type: 'application/json',
       body: JSON.stringify(
-        media.map(({ uid, ext }) => ({
-          filename: static(`media/${uid}.${ext}`),
+        media.map(({ uid, filename, description = '' }) => ({
+          filePath: static(`/media/${filename}`),
+          description,
           uid,
         }))
       ),
