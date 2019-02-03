@@ -1,9 +1,11 @@
+const { DefinePlugin } = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const DEV = process.env.NODE_ENV !== 'production';
+const PROD = process.env.NODE_ENV === 'production';
 const DIST_FOLDER = path.join('src', 'http', 'get-assets-000file', 'files');
 const LIB_FOLDER = path.join(__dirname, 'lib', 'scripts');
 
@@ -48,6 +50,26 @@ const optimization = {
   ],
 };
 
+const babelPlugins = [
+  '@babel/plugin-proposal-class-properties',
+  [
+    '@babel/plugin-transform-runtime',
+    {
+      regenerator: true,
+    },
+  ],
+];
+
+if (PROD) {
+  babelPlugins.unshift([
+    'transform-react-remove-prop-types',
+    {
+      mode: 'wrap',
+      ignoreFilenames: ['node_modules'],
+    },
+  ]);
+}
+
 const config = {
   mode,
 
@@ -71,7 +93,8 @@ const config = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env'],
+            presets: ['@babel/preset-env', '@babel/preset-react'],
+            plugins: babelPlugins,
           },
         },
       },
@@ -116,6 +139,9 @@ const config = {
       template: path.resolve(__dirname, path.join('lib', 'layout', 'blog.ejs')),
       inject: false,
       LAYOUT_BANNER,
+    }),
+    new DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
     }),
   ],
 };
