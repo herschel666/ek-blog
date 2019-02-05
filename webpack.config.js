@@ -4,8 +4,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-const DEV = process.env.NODE_ENV !== 'production';
-const PROD = process.env.NODE_ENV === 'production';
+const { NODE_ENV = 'testing' } = process.env; // Mimic the @architect behaviour.
+const DEV = NODE_ENV !== 'production';
+const PROD = NODE_ENV === 'production';
 const DIST_FOLDER = path.join('src', 'http', 'get-assets-000file', 'files');
 const LIB_FOLDER = path.join(__dirname, 'lib', 'scripts');
 
@@ -141,7 +142,7 @@ const config = {
       LAYOUT_BANNER,
     }),
     new DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
     }),
   ],
 };

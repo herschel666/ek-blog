@@ -1,5 +1,5 @@
 const { readFileSync: readFile } = require('fs');
-const { extname } = require('path');
+const { resolve, extname } = require('path');
 
 const getType = (suffix) => {
   switch (suffix) {
@@ -12,12 +12,23 @@ const getType = (suffix) => {
   }
 };
 
+const getFile = (file) => {
+  let pathname = `./files/${file}`;
+
+  if (file.startsWith('vendor_') && process.env.NODE_ENV === 'testing') {
+    const [folder, filename] = file.split('_');
+    pathname = resolve(__dirname, '..', '..', '..', 'lib', folder, filename);
+  }
+
+  return readFile(pathname, 'utf8');
+};
+
 exports.handler = async (req) => {
   console.log();
   console.log(req);
 
   try {
-    const body = readFile(`./files/${req.params.file}`, 'utf8');
+    const body = getFile(req.params.file);
     const type = getType(extname(req.params.file).substring(1));
 
     return {
