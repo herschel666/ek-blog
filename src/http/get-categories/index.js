@@ -1,22 +1,27 @@
 const data = require('@architect/data');
+const arc = require('@architect/functions');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
+const { iterate } = require('@architect/views/util');
 
 const getBody = (categories) =>
   layout(
     'Kategorien :: ek|blog',
     html`
-      <h1>Categories</h1>
+      <h1>Kategorien</h1>
       <ol>
         ${
-          categories.reduce(
-            (str, { slug, title }) => html`
-              ${str}
+          iterate(
+            categories,
+            ({ slug, title }) => html`
               <li>
-                <h2><a href="/categories/${slug}">${title}</a></h2>
+                <h2>
+                  <a href="${arc.http.helpers.url(`/categories/${slug}`)}">
+                    ${title}
+                  </a>
+                </h2>
               </li>
-            `,
-            ''
+            `
           )
         }
       </ol>

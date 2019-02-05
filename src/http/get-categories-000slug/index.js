@@ -1,6 +1,8 @@
 const data = require('@architect/data');
+const arc = require('@architect/functions');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
+const { iterate } = require('@architect/views/util');
 
 const getBody = ({ categoryTitle, posts }) =>
   layout(
@@ -9,12 +11,15 @@ const getBody = ({ categoryTitle, posts }) =>
       <h1>${categoryTitle}</h1>
       <ol>
         ${
-          posts.reduce(
-            (str, { title, slug }) => html`
-              ${str}
-              <h2><a href="/posts/${slug}">${title}</a></h2>
-            `,
-            ''
+          iterate(
+            posts,
+            ({ title, slug }) => html`
+              <h2>
+                <a href="${arc.http.helpers.url(`/posts/${slug}`)}">
+                  ${title}
+                </a>
+              </h2>
+            `
           )
         }
       </ol>

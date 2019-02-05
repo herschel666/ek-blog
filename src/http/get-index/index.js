@@ -1,8 +1,10 @@
 const marked = require('marked');
 const data = require('@architect/data');
+const arc = require('@architect/functions');
 const { getNiceDate } = require('@architect/shared/util');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
+const { iterate } = require('@architect/views/util');
 
 const ITEMS_PER_PAGE = 3;
 
@@ -10,43 +12,50 @@ const getBody = ({ raw, posts, hasPosts, prevPage, nextPage }) =>
   layout(
     'ek|blog',
     html`
-      <p><a href="/categories">All categories</a></p>
+      <p><a href="${arc.http.helpers.url('/categories')}">All categories</a></p>
       <hr />
       ${
         hasPosts
           ? html`
               <h1>Posts</h1>
               ${
-                posts.reduce(
-                  (str, { content, title, slug, createdAt }) =>
+                iterate(
+                  posts,
+                  ({ content, title, slug, createdAt }) =>
                     html`
-                      ${str}
                       <div>
-                        <h2><a href="/posts/${slug}">${title}</a></h2>
-                        <strong
-                          >Created at
-                          <time datetime="${createdAt}"
-                            >${getNiceDate(createdAt)}</time
-                          >
+                        <h2>
+                          <a href="${arc.http.helpers.url(`/posts/${slug}`)}">
+                            ${title}
+                          </a>
+                        </h2>
+                        <strong>
+                          Created at
+                          <time datetime="${createdAt}">
+                            ${getNiceDate(createdAt)}
+                          </time>
                         </strong>
                         ${marked(content)}
                       </div>
-                    `,
-                  ''
+                    `
                 )
               }
               <div>
                 ${
                   prevPage
                     ? html`
-                        <a href="/?page=${prevPage}">Prev page</a>
+                        <a href="${arc.http.helpers.url(`/?page=${prevPage}`)}">
+                          Prev page
+                        </a>
                       `
                     : ''
                 }
                 ${
                   nextPage
                     ? html`
-                        <a href="/?page=${nextPage}">Next page</a>
+                        <a href="${arc.http.helpers.url(`/?page=${nextPage}`)}">
+                          Next page
+                        </a>
                       `
                     : ''
                 }
@@ -56,14 +65,17 @@ const getBody = ({ raw, posts, hasPosts, prevPage, nextPage }) =>
               <h1>There are no posts.</h1>
             `
       }
-      <hr />
-      <details>
-        <summary>Data</summary>
-        <pre>
-        ${JSON.stringify(raw, null, 2)}
-      </pre
-        >
-      </details>
+      ${
+        process.env.NODE_ENV === 'testing'
+          ? html`
+              <hr />
+              <details>
+                <summary>Data</summary>
+                <pre>${JSON.stringify(raw, null, 2)}</pre>
+              </details>
+            `
+          : ''
+      }
     `
   );
 
