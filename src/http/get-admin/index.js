@@ -9,7 +9,7 @@ exports.handler = async (req) => {
   const body = site(
     html`
       <script>
-        __blog__.baseUrl = '${arc.http.helpers.url('/')}';
+        window.__blog__.baseUrl = '${arc.http.helpers.url('/')}';
       </script>
     `
   );
