@@ -153,7 +153,10 @@ exports.handler = async (req) => {
     blogpostCount,
   ] = await getData(lastEvaluatedKey);
   const prevPage = offset === 0 ? null : currentPage - 1;
-  const nextPage = hasNextPage ? currentPage + 1 : null;
+  const nextPage =
+    hasNextPage && offset + ITEMS_PER_PAGE < blogpostCount
+      ? currentPage + 1
+      : null;
   const hasPosts = posts.length && offset <= blogpostCount;
   const status = hasPosts || typeof req.query.page === 'undefined' ? 200 : 404;
   const body = getBody({
