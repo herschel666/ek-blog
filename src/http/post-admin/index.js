@@ -4,8 +4,7 @@ const login = async (req) => {
   const { token = '' } = req.body;
   const session = await arc.http.session.read(req);
 
-  // TODO: used hashed token
-  session.loggedIn = token === 'yolo-swag';
+  session.loggedIn = token === process.env.AUTH_TOKEN;
 
   const cookie = await arc.http.session.write(session);
 
