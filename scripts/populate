@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+echo "Creating category 'Foobar'..."
+curl -H 'Content-type: application/json' -d '{"title": "Foobar"}' http://localhost:3333/api/categories
+
+echo "Creating category 'Swag'..."
+curl -H 'Content-type: application/json' -d '{"title": "Swag"}' http://localhost:3333/api/categories
+
+echo "Creating category 'Geloet'..."
+curl -H 'Content-type: application/json' -d '{"title": "Geloet"}' http://localhost:3333/api/categories
+
+CATEGORIES="$(curl -s http://localhost:3333/api/categories)"
+
+CAT_1="$(echo $CATEGORIES | jq '.[0].uid' | sed 's/"//g')"
+echo "Creating post 1 in category $(echo $CATEGORIES | jq '.[0].title')..."
+POST_1="{
+  \"title\": \"Hello World\",
+  \"content\": \"Lorem ipsum.\",
+  \"categories\": [\"$CAT_1\"],
+  \"createdAt\": \"2017-05-10T15:05:00.000Z\"
+}"
+curl -H 'Content-type: application/json' -d "$POST_1" http://localhost:3333/api/posts
+
+CAT_2="$(echo $CATEGORIES | jq '.[1].uid' | sed 's/"//g')"
+echo "Creating post 2 in category $(echo $CATEGORIES | jq '.[1].title')..."
+POST_2="{
+  \"title\": \"Number #2\",
+  \"content\": \"Dolor sit amet.\",
+  \"categories\": [\"$CAT_2\"],
+  \"createdAt\": \"2018-03-24T08:36:02.000Z\"
+}"
+curl -H 'Content-type: application/json' -d "$POST_2" http://localhost:3333/api/posts
+
+CAT_3="$(echo $CATEGORIES | jq '.[2].uid' | sed 's/"//g')"
+echo "Creating post 3 in categories $(echo $CATEGORIES | jq '.[0].title') and $(echo $CATEGORIES | jq '.[2].title')..."
+POST_3="{
+  \"title\": \"Number #3\",
+  \"content\": \"Foo Bar Baz. Dolor sitttt amet.\",
+  \"categories\": [\"$CAT_1\", \"$CAT_3\"],
+  \"createdAt\": \"2018-03-28T09:18:02.000Z\"
+}"
+curl -H 'Content-type: application/json' -d "$POST_3" http://localhost:3333/api/posts
+
+echo "Creating post 4 in category $(echo $CATEGORIES | jq '.[1].title')..."
+POST_4="{
+  \"title\": \"Number #4\",
+  \"content\": \"dxth xdgb xdgh d bff bdf bdxv. dyxfg xg dh dyfdxb dfx bxdfb ydf yfg ysfxv. syfg fb ysgf.\",
+  \"categories\": [\"$CAT_2\"],
+  \"createdAt\": \"2018-04-02T13:04:02.000Z\"
+}"
+curl -H 'Content-type: application/json' -d "$POST_4" http://localhost:3333/api/posts
+
+echo "Creating post 5 in category $(echo $CATEGORIES | jq '.[0].title')..."
+POST_5="{
+  \"title\": \"Number #5\",
+  \"content\": \"dxth xdgb xdgh d bff bdf bdxv. dyxfg xg dh dyfdxb dfx bxdfb ydf yfg ysfxv. syfg fb ysgf.\",
+  \"categories\": [\"$CAT_1\"],
+  \"createdAt\": \"2018-05-02T13:05:02.000Z\"
+}"
+curl -H 'Content-type: application/json' -d "$POST_5" http://localhost:3333/api/posts
+
+echo "Creating post 6 in category $(echo $CATEGORIES | jq '.[2].title')..."
+POST_6="{
+  \"title\": \"Number #6\",
+  \"content\": \"dxth xdgb xdgh d bff bdf bdxv. dyxfg xg dh dyfdxb dfx bxdfb ydf yfg ysfxv. syfg fb ysgf.\",
+  \"categories\": [\"$CAT_3\"],
+  \"createdAt\": \"2018-06-02T13:06:02.000Z\"
+}"
+curl -H 'Content-type: application/json' -d "$POST_6" http://localhost:3333/api/posts
+
+echo "Creating post 7 in categories $(echo $CATEGORIES | jq '.[1].title') and $(echo $CATEGORIES | jq '.[2].title')..."
+POST_7="{
+  \"title\": \"Number #7\",
+  \"content\": \"dxth xdgb xdgh d bff bdf bdxv. dyxfg xg dh dyfdxb dfx bxdfb ydf yfg ysfxv. syfg fb ysgf.\",
+  \"categories\": [\"$CAT_2\", \"$CAT_3\"],
+  \"createdAt\": \"2018-07-02T13:07:02.000Z\"
+}"
+curl -H 'Content-type: application/json' -d "$POST_7" http://localhost:3333/api/posts
