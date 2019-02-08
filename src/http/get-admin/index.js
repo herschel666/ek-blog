@@ -16,6 +16,7 @@ const loggedOutBody = blog(
             type="password"
             name="token"
             placeholder="Enter login token&hellip;"
+            autofocus
           />
         </label>
         <button>Submit</button>
