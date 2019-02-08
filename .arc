@@ -16,12 +16,10 @@ get /api/posts
 get /api/posts/:uid
 get /api/categories
 get /api/media
-get /import
 
 post /api/posts
 post /api/categories
 post /api/media
-post /import
 
 put /api/posts/:uid
 put /api/categories/:uid
