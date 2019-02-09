@@ -1,12 +1,12 @@
 const marked = require('marked');
-const data = require('@architect/data');
 const arc = require('@architect/functions');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
-const { iterate } = require('@architect/views/util');
+const { getBlogpostBySlug } = require('@architect/shared/model');
 const { getNiceDate } = require('@architect/shared/util');
+const { iterate } = require('@architect/views/util');
 
-const getBody = ({ title, content, createdAt }, categories) =>
+const getBody = ({ title, content, createdAt, categories }) =>
   layout(
     `"${title}" :: ek|blog`,
     html`
@@ -31,43 +31,30 @@ const getBody = ({ title, content, createdAt }, categories) =>
     `
   );
 
+const get404 = () =>
+  layout(
+    'Nichts gefunden :: ek|blog',
+    html`
+      <h1>Nichts gefunden.</h1>
+      <p>Sorry, aber die Seite, die du suchst, existiert nicht.</p>
+      <p><a href="${arc.http.helpers.url('/')}">Zurück zur Startseite</a></p>
+    `
+  );
+
 exports.handler = async (req) => {
   console.log();
   console.log(req);
 
-  const {
-    Items: [blogpost],
-  } = await data.blog.query({
-    KeyConditionExpression: 'kind = :kind',
-    FilterExpression: 'slug = :slug',
-    ProjectionExpression: 'title, content, createdAt, categories',
-    ExpressionAttributeValues: {
-      ':kind': 'blogpost',
-      ':slug': req.params.slug,
-    },
+  const blogpost = await getBlogpostBySlug({
+    slug: req.params.slug,
+    values: ['title', 'content', 'createdAt', 'categories'],
   });
-  const categoriesFilterExpression = blogpost.categories
-    .map((_, index) => `uid = :uid${index}`)
-    .join(' OR ');
-  const categoriesExpresionAttributeValues = blogpost.categories.reduce(
-    (values, uid, index) =>
-      Object.assign(values, {
-        [`:uid${index}`]: uid,
-      }),
-    {
-      ':kind': 'category',
-    }
-  );
-  const { Items: categories } = await data.blog.query({
-    KeyConditionExpression: 'kind = :kind',
-    FilterExpression: categoriesFilterExpression,
-    ProjectionExpression: 'title, slug',
-    ExpressionAttributeValues: categoriesExpresionAttributeValues,
-  });
-  const body = getBody(blogpost, categories);
+  const body = blogpost ? getBody(blogpost) : get404();
+  const status = blogpost ? 200 : 404;
 
   return {
     type: 'text/html; charset=utf8',
+    status,
     body,
   };
 };

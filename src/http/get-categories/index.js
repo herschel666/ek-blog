@@ -1,5 +1,5 @@
-const data = require('@architect/data');
 const arc = require('@architect/functions');
+const { getCategories } = require('@architect/shared/model');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
 const { iterate } = require('@architect/views/util');
@@ -32,12 +32,8 @@ exports.handler = async (req) => {
   console.log();
   console.log(req);
 
-  const { Items: categories } = await data.blog.query({
-    KeyConditionExpression: 'kind = :kind',
-    ProjectionExpression: 'slug, title',
-    ExpressionAttributeValues: {
-      ':kind': 'category',
-    },
+  const categories = await getCategories({
+    values: ['slug', 'title'],
   });
   const body = getBody(categories);
 

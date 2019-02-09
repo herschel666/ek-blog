@@ -1,14 +1,17 @@
 const marked = require('marked');
-const data = require('@architect/data');
 const arc = require('@architect/functions');
+const {
+  ITEMS_PER_PAGE,
+  getBlogposts,
+  getBlogpostsCount,
+  getLastBlogpostStartKeyByOffset,
+} = require('@architect/shared/model');
 const { getNiceDate } = require('@architect/shared/util');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
 const { iterate } = require('@architect/views/util');
 
-const ITEMS_PER_PAGE = 3;
-
-const getBody = ({ raw, posts, hasPosts, prevPage, nextPage }) =>
+const getBody = ({ posts, hasPosts, prevPage, nextPage }) =>
   layout(
     'ek|blog',
     html`
@@ -65,80 +68,8 @@ const getBody = ({ raw, posts, hasPosts, prevPage, nextPage }) =>
               <h1>There are no posts.</h1>
             `
       }
-      ${
-        process.env.NODE_ENV === 'testing'
-          ? html`
-              <hr />
-              <details>
-                <summary>Data</summary>
-                <pre>${JSON.stringify(raw, null, 2)}</pre>
-              </details>
-            `
-          : ''
-      }
     `
   );
-
-const getByKind = async (
-  kind,
-  projectionExpression,
-  limit = null,
-  exclusiveStartKey = null
-) => {
-  try {
-    const result = await data.blog.query({
-      KeyConditionExpression: 'kind = :kind',
-      ProjectionExpression: projectionExpression,
-      ExpressionAttributeValues: {
-        ':kind': kind,
-      },
-      ScanIndexForward: false,
-      Limit: limit,
-      ExclusiveStartKey: exclusiveStartKey,
-    });
-
-    return result;
-  } catch (err) {
-    console.log('\nget-index::', kind, err);
-    return [];
-  }
-};
-
-const getLastEvaluatedKey = async (offset) => {
-  if (offset === 0) {
-    return null;
-  }
-  const { LastEvaluatedKey: lastEvaluatedKey } = await getByKind(
-    'blogpost',
-    'uid',
-    offset
-  );
-  return lastEvaluatedKey;
-};
-
-const getBlogpostCount = async () => {
-  const { Count: count } = await data.blog.query({
-    KeyConditionExpression: 'kind = :kind',
-    ProjectionExpression: 'uid',
-    ExpressionAttributeValues: {
-      ':kind': 'blogpost',
-    },
-    Select: 'COUNT',
-  });
-  return count;
-};
-
-const getData = async (lastEvaluatedKey) =>
-  Promise.all([
-    data.blog.scan({}),
-    getByKind(
-      'blogpost',
-      'content, title, slug, createdAt',
-      ITEMS_PER_PAGE,
-      lastEvaluatedKey
-    ),
-    getBlogpostCount(),
-  ]);
 
 exports.handler = async (req) => {
   console.log();
@@ -146,12 +77,14 @@ exports.handler = async (req) => {
 
   const currentPage = Number(req.query.page || '1');
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-  const lastEvaluatedKey = await getLastEvaluatedKey(offset);
-  const [
-    raw,
-    { Items: posts = [], LastEvaluatedKey: hasNextPage },
-    blogpostCount,
-  ] = await getData(lastEvaluatedKey);
+  const startKey = await getLastBlogpostStartKeyByOffset(offset);
+  const [{ posts = [], hasNextPage }, blogpostCount] = await Promise.all([
+    getBlogposts({
+      values: ['content', 'title', 'slug', 'createdAt'],
+      startKey,
+    }),
+    getBlogpostsCount(),
+  ]);
   const prevPage = offset === 0 ? null : currentPage - 1;
   const nextPage =
     hasNextPage && offset + ITEMS_PER_PAGE < blogpostCount
@@ -160,7 +93,6 @@ exports.handler = async (req) => {
   const hasPosts = posts.length && offset <= blogpostCount;
   const status = hasPosts || typeof req.query.page === 'undefined' ? 200 : 404;
   const body = getBody({
-    raw,
     posts,
     hasPosts,
     prevPage,
