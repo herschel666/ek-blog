@@ -8,7 +8,7 @@ const { iterate } = require('@architect/views/util');
 
 const getBody = ({ title, content, createdAt, categories }) =>
   layout(
-    `"${title}" :: ek|blog`,
+    `"${title}"`,
     html`
       <h1>${title}</h1>
       <strong>
@@ -33,7 +33,7 @@ const getBody = ({ title, content, createdAt, categories }) =>
 
 const get404 = () =>
   layout(
-    'Nichts gefunden :: ek|blog',
+    'Nichts gefunden',
     html`
       <h1>Nichts gefunden.</h1>
       <p>Sorry, aber die Seite, die du suchst, existiert nicht.</p>

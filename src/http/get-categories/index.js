@@ -6,7 +6,7 @@ const { iterate } = require('@architect/views/util');
 
 const getBody = (categories) =>
   layout(
-    'Kategorien :: ek|blog',
+    'Kategorien',
     html`
       <h1>Kategorien</h1>
       <ol>

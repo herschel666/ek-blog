@@ -13,7 +13,6 @@ const { iterate } = require('@architect/views/util');
 
 const getBody = ({ posts, hasPosts, prevPage, nextPage }) =>
   layout(
-    'ek|blog',
     html`
       <p><a href="${arc.http.helpers.url('/categories')}">All categories</a></p>
       <hr />
