@@ -64,7 +64,7 @@ const getBody = ({ posts, hasPosts, prevPage, nextPage }) =>
               </div>
             `
           : html`
-              <h1>There are no posts.</h1>
+              <h1>Es gibt noch keine Beiträge.</h1>
             `
       }
     `

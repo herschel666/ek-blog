@@ -6,6 +6,7 @@ const {
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
 const { iterate } = require('@architect/views/util');
+const get404 = require('@architect/views/partials/get-404');
 
 const getBody = ({ category, posts }) =>
   layout(
@@ -43,10 +44,12 @@ exports.handler = async (req) => {
       values: ['content', 'title', 'slug', 'createdAt', 'categories'],
     }),
   ]);
-  const body = getBody({ category, posts });
+  const body = category ? getBody({ category, posts }) : get404();
+  const status = category ? 200 : 404;
 
   return {
     type: 'text/html; charset=utf8',
+    status,
     body,
   };
 };
