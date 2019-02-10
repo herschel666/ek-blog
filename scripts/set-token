@@ -8,6 +8,17 @@ const inquirer = require('inquirer');
 const environments = ['testing', 'staging', 'production'];
 const [, , env] = process.argv;
 
+if (env === '-h' || env === '--help') {
+  console.log('');
+  console.log(
+    'Set the administration panel login token for a certain environment.'
+  );
+  console.log('');
+  console.log('  $ ./scripts/set-token <environment>');
+  console.log('');
+  process.exit();
+}
+
 if (!environments.includes(env)) {
   console.log('');
   console.log(chalk.red.bold('Please pass in a valid environment.'));
