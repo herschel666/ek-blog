@@ -1,0 +1,83 @@
+#!/usr/bin/env node
+
+const { exec } = require('child_process');
+const bcrypt = require('bcryptjs');
+const chalk = require('chalk');
+const inquirer = require('inquirer');
+
+const environments = ['testing', 'staging', 'production'];
+const [, , env] = process.argv;
+
+if (!environments.includes(env)) {
+  console.log('');
+  console.log(chalk.red.bold('Please pass in a valid environment.'));
+  console.log('');
+  console.log(chalk.red('Valid environments are:'));
+  console.log('');
+  console.log(chalk.red(` • ${environments.join('\n • ')}`));
+  console.log('');
+
+  process.exit(1);
+}
+
+console.log('');
+console.log(`Setting tthe token for "${env}" environment.`);
+console.log('');
+
+const writeToken = (token) =>
+  new Promise((resolve, reject) => {
+    const arcEnv = exec(
+      `npx env ${env} AUTH_TOKEN ${token.replace(/\$/g, '\\$')}`
+    );
+    let error = '';
+
+    arcEnv.stdout.on('data', (data) => {
+      process.stdout.write(data.toString());
+    });
+
+    arcEnv.stderr.on('data', (data) => {
+      error += data.toString();
+    });
+
+    arcEnv.on('exit', (code) => {
+      if (code !== 0 || error !== '') {
+        reject(error || 'Something went wrong.');
+        return;
+      }
+      resolve();
+    });
+  });
+
+inquirer
+  .prompt([
+    {
+      type: 'password',
+      message: 'Set token',
+      name: 'token',
+    },
+    {
+      type: 'password',
+      message: 'Confirm token',
+      name: 'tokenConfirm',
+    },
+  ])
+  .then(({ token, tokenConfirm }) => {
+    if (token !== tokenConfirm) {
+      console.log('');
+      console.log(
+        chalk.red.bold('The confirmation did not match. Please try again.')
+      );
+      console.log('');
+
+      process.exit(1);
+    }
+
+    return bcrypt.hashSync(token, bcrypt.genSaltSync(10));
+  })
+  .then(writeToken)
+  .catch((error) => {
+    console.log('');
+    console.log(chalk.red.bold(error));
+    console.log('');
+    process.exit(1);
+  });
