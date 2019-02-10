@@ -46,7 +46,7 @@ exports.writeFile = async (buffer) => {
   const filename = `${md5(buffer)}.${ext}`;
 
   await writeFile(
-    path.resolve(__dirname, '..', '..', 'public', 'media', filename),
+    path.resolve(process.cwd(), '..', '..', '..', 'public', 'media', filename),
     buffer
   );
 
@@ -55,6 +55,6 @@ exports.writeFile = async (buffer) => {
 
 exports.deleteFile = async (filename) => {
   await unlink(
-    path.resolve(__dirname, '..', '..', 'public', 'media', filename)
+    path.resolve(process.cwd(), '..', '..', '..', 'public', 'media', filename)
   );
 };
