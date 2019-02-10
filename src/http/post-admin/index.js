@@ -1,10 +1,11 @@
 const arc = require('@architect/functions');
+const bcrypt = require('bcryptjs');
 
 const login = async (req) => {
   const { token = '' } = req.body;
   const session = await arc.http.session.read(req);
 
-  session.loggedIn = token === process.env.AUTH_TOKEN;
+  session.loggedIn = bcrypt.compareSync(token, process.env.AUTH_TOKEN);
 
   const cookie = await arc.http.session.write(session);
 
