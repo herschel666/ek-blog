@@ -4,7 +4,7 @@ const admin = require('@architect/views/layouts/admin');
 const html = require('@architect/views/html');
 
 const loggedOutBody = blog(
-  'Admin :: ek|blog',
+  'Admin',
   html`
     <form action="${arc.http.helpers.url('/admin')}" method="post">
       <input type="hidden" name="action" value="login" />

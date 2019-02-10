@@ -1,12 +1,5 @@
-const path = require('path');
-const fs = require('fs');
-const { promisify } = require('util');
-const data = require('@architect/data');
-const fileType = require('file-type');
-const shortid = require('shortid');
-const md5 = require('md5');
-
-const writeFile = promisify(fs.writeFile);
+const { createMedia } = require('@architect/shared/model');
+const { writeFile } = require('@architect/shared/util');
 
 exports.handler = async (req) => {
   const { image, description } = req.body;
@@ -23,25 +16,9 @@ exports.handler = async (req) => {
 
   try {
     const imageBuffer = new Buffer(image, 'base64');
-    const { ext } = fileType(imageBuffer);
-    const uid = `m${shortid.generate()}`;
-    const filename = `${md5(imageBuffer)}.${ext}`;
-    const createdAt = new Date().toISOString();
+    const { filename, ext } = await writeFile(imageBuffer);
 
-    await Promise.all([
-      writeFile(
-        path.resolve(__dirname, '..', '..', '..', 'public', 'media', filename),
-        imageBuffer
-      ),
-      data.blog.put({
-        kind: 'media',
-        createdAt,
-        filename,
-        description,
-        uid,
-        ext,
-      }),
-    ]);
+    await createMedia({ filename, ext, description });
 
     return {
       status: 201,

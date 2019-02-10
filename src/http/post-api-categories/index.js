@@ -1,19 +1,20 @@
-const data = require('@architect/data');
-const shortid = require('shortid');
-const { slugify } = require('@architect/shared/util');
+const {
+  CATEGORY_ALREADY_EXISTS,
+  createCategory,
+} = require('@architect/shared/model');
 
-const getPayload = (title) => {
-  const slug = slugify(title, { lower: true });
-  const createdAt = new Date().toISOString();
-  const uid = `c${shortid.generate()}`;
-  const payload = {
-    kind: 'category',
-    createdAt,
-    uid,
-    slug,
-    title,
-  };
-  return payload;
+const SERVER_ERROR = 'server_error';
+const TITLE_MISSING = 'title_missing';
+const ALREADY_EXISTS = 'already_exists';
+
+const getErrorType = (err) => {
+  switch (err.message) {
+    case TITLE_MISSING:
+    case ALREADY_EXISTS:
+      return err.message;
+    default:
+      return SERVER_ERROR;
+  }
 };
 
 exports.handler = async (req) => {
@@ -23,14 +24,26 @@ exports.handler = async (req) => {
   const { title } = req.body;
 
   try {
-    // TODO: check whether slug already exists
-    await data.blog.put(getPayload(title));
+    if (!title) {
+      throw new Error(TITLE_MISSING);
+    }
+
+    const result = await createCategory({ title });
+
+    if (result === CATEGORY_ALREADY_EXISTS) {
+      throw new Error(ALREADY_EXISTS);
+    }
   } catch (err) {
-    console.log('\npost-create-category', err);
+    console.log(err);
+
+    const error = true;
+    const type = getErrorType(err);
+    const status = type === SERVER_ERROR ? 500 : 400;
+
     return {
-      status: 500,
       type: 'application/json',
-      body: JSON.stringify({ error: true }),
+      body: JSON.stringify({ error, type }),
+      status,
     };
   }
 

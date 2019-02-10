@@ -1,5 +1,13 @@
+const path = require('path');
+const fs = require('fs');
+const { promisify } = require('util');
 const arc = require('@architect/functions');
 const slugify = require('slugify');
+const fileType = require('file-type');
+const md5 = require('md5');
+
+const writeFile = promisify(fs.writeFile);
+const unlink = promisify(fs.unlink);
 
 slugify.extend({
   ü: 'ue',
@@ -32,3 +40,21 @@ exports.getNiceDate = (dateStr) => {
 exports.slugify = slugify;
 
 exports.assets = (filename) => arc.http.helpers.url(`/assets/${filename}`);
+
+exports.writeFile = async (buffer) => {
+  const { ext } = fileType(buffer);
+  const filename = `${md5(buffer)}.${ext}`;
+
+  await writeFile(
+    path.resolve(__dirname, '..', '..', 'public', 'media', filename),
+    buffer
+  );
+
+  return { filename, ext };
+};
+
+exports.deleteFile = async (filename) => {
+  await unlink(
+    path.resolve(__dirname, '..', '..', 'public', 'media', filename)
+  );
+};

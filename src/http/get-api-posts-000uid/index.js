@@ -1,56 +1,26 @@
-const data = require('@architect/data');
-
-const getCategories = async (uids = []) => {
-  const result = await Promise.all(
-    uids.map((uid) =>
-      data.blog.query({
-        KeyConditionExpression: 'kind = :kind',
-        FilterExpression: 'uid = :uid',
-        ProjectionExpression: 'uid, title',
-        ExpressionAttributeValues: {
-          ':kind': 'category',
-          ':uid': uid,
-        },
-      })
-    )
-  );
-  return result.map(({ Items: [{ uid, title }] }) => ({
-    uid,
-    title,
-  }));
-};
-
-const getBlogpost = async (uid) => {
-  const result = await data.blog.query({
-    KeyConditionExpression: 'kind = :kind',
-    FilterExpression: 'uid = :uid',
-    ProjectionExpression: 'uid, content, title, slug, createdAt, categories',
-    ExpressionAttributeValues: {
-      ':kind': 'blogpost',
-      ':uid': uid,
-    },
-  });
-
-  return result;
-};
+const { getBlogpostByUid } = require('@architect/shared/model');
 
 exports.handler = async (req) => {
   console.log();
   console.log(req);
 
   try {
-    const { Items: [post] = [] } = await getBlogpost(req.params.uid);
-    const categories = await getCategories(post.categories);
+    const post = await getBlogpostByUid({
+      values: ['uid', 'title', 'content', 'categories'],
+      uid: req.params.uid,
+    });
+    const status = post ? 200 : 404;
 
     return {
       type: 'application/json',
-      body: JSON.stringify(Object.assign(post, { categories })),
+      body: JSON.stringify(post),
+      status,
     };
   } catch (err) {
     console.log(err);
 
     return {
-      statud: 500,
+      status: 500,
       type: 'application/json',
       body: JSON.stringify({ error: true }),
     };

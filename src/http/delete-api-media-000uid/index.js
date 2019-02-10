@@ -1,46 +1,21 @@
-const path = require('path');
-const fs = require('fs');
-const { promisify } = require('util');
-const data = require('@architect/data');
-
-class NoUidError extends Error {}
-
-const getMeta = async (uid) => {
-  const {
-    Items: [{ filename, createdAt } = {}],
-  } = await data.blog.query({
-    KeyConditionExpression: 'kind = :kind',
-    ProjectionExpression: 'filename, createdAt',
-    FilterExpression: 'uid = :uid',
-    ExpressionAttributeValues: {
-      ':kind': 'media',
-      ':uid': uid,
-    },
-  });
-  return { filename, createdAt };
-};
-
-const unlink = promisify(fs.unlink);
+const NoUidError = require('@architect/shared/no-uid-error');
+const { deleteMediaByUid } = require('@architect/shared/model');
+const { deleteFile } = require('@architect/shared/util');
 
 exports.handler = async (req) => {
   console.log();
   console.log(req);
 
+  const { uid } = req.params;
+
   try {
-    if (!req.params.uid) {
+    if (!uid) {
       throw NoUidError();
     }
 
-    const { filename, createdAt } = await getMeta(req.params.uid);
-    await Promise.all([
-      data.blog.delete({
-        kind: 'media',
-        createdAt,
-      }),
-      unlink(
-        path.resolve(__dirname, '..', '..', '..', 'public', 'media', filename)
-      ),
-    ]);
+    const filename = await deleteMediaByUid({ uid });
+
+    await deleteFile(filename);
 
     return {
       status: 202,

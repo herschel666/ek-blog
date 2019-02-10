@@ -1,17 +1,18 @@
 const marked = require('marked');
 const arc = require('@architect/functions');
+const data = require('@architect/data');
 const {
-  ITEMS_PER_PAGE,
-  getBlogposts,
+  BLOGPOSTS_PER_PAGE,
+  getPaginatedByKind,
   getBlogpostsCount,
-  getLastBlogpostStartKeyByOffset,
+  getLastStartKeyByOffsetForKind,
 } = require('@architect/shared/model');
 const { getNiceDate } = require('@architect/shared/util');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
 const { iterate } = require('@architect/views/util');
 
-const getBody = ({ posts, hasPosts, prevPage, nextPage }) =>
+const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
   layout(
     html`
       <p><a href="${arc.http.helpers.url('/categories')}">All categories</a></p>
@@ -67,6 +68,11 @@ const getBody = ({ posts, hasPosts, prevPage, nextPage }) =>
               <h1>Es gibt noch keine Beiträge.</h1>
             `
       }
+      <hr />
+      <details>
+        <summary>Rohdaten</summary>
+        <pre>${raw}</pre>
+      </details>
     `
   );
 
@@ -75,18 +81,28 @@ exports.handler = async (req) => {
   console.log(req);
 
   const currentPage = Number(req.query.page || '1');
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-  const startKey = await getLastBlogpostStartKeyByOffset(offset);
-  const [{ posts = [], hasNextPage }, blogpostCount] = await Promise.all([
-    getBlogposts({
+  const offset = (currentPage - 1) * BLOGPOSTS_PER_PAGE;
+  const startKey = await getLastStartKeyByOffsetForKind({
+    kind: 'blogpost',
+    offset,
+  });
+  const [
+    { items: posts = [], hasNextPage },
+    blogpostCount,
+    raw,
+  ] = await Promise.all([
+    getPaginatedByKind({
+      kind: 'blogpost',
       values: ['content', 'title', 'slug', 'createdAt'],
+      limit: BLOGPOSTS_PER_PAGE,
       startKey,
     }),
     getBlogpostsCount(),
+    data.blog.scan({}),
   ]);
   const prevPage = offset === 0 ? null : currentPage - 1;
   const nextPage =
-    hasNextPage && offset + ITEMS_PER_PAGE < blogpostCount
+    hasNextPage && offset + BLOGPOSTS_PER_PAGE < blogpostCount
       ? currentPage + 1
       : null;
   const hasPosts = posts.length && offset <= blogpostCount;
@@ -96,6 +112,7 @@ exports.handler = async (req) => {
     hasPosts,
     prevPage,
     nextPage,
+    raw: JSON.stringify(raw, null, 2),
   });
 
   return {

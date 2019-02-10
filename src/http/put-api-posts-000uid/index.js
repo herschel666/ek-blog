@@ -1,38 +1,4 @@
-const data = require('@architect/data');
-
-const getCategoryParams = (categorySlugs) =>
-  categorySlugs.reduce((params, slug) => `${params}cat:${slug}#`, '#');
-
-const getParams = (dateTime, categorySlugs, uid) =>
-  `#${uid}#${dateTime}${getCategoryParams(categorySlugs)}`;
-
-const getBlogpost = (uid) =>
-  data.blog.query({
-    KeyConditionExpression: 'kind = :kind',
-    FilterExpression: 'uid = :uid',
-    ExpressionAttributeValues: {
-      ':kind': 'blogpost',
-      ':uid': uid,
-    },
-  });
-
-const getCategorySlugs = (categories) =>
-  Promise.all(
-    categories.map(async (uid) => {
-      const {
-        Items: [{ slug }],
-      } = await data.blog.query({
-        KeyConditionExpression: 'kind = :kind',
-        FilterExpression: 'uid = :uid',
-        ProjectionExpression: 'slug',
-        ExpressionAttributeValues: {
-          ':kind': 'category',
-          ':uid': uid,
-        },
-      });
-      return slug;
-    })
-  );
+const { TARGET_NOT_FOUND, updateBlogpost } = require('@architect/shared/model');
 
 exports.handler = async (req) => {
   console.log();
@@ -43,19 +9,16 @@ exports.handler = async (req) => {
   const categories = [].concat(cats).filter(Boolean);
 
   try {
-    const [{ Items: [blogpost] = [] }, categorySlugs] = await Promise.all([
-      getBlogpost(uid),
-      getCategorySlugs(categories),
-    ]);
-    // TODO: https://arc.codes/reference/data-update
-    await data.blog.put(
-      Object.assign(blogpost, {
-        params: getParams(blogpost.createdAt, categorySlugs, uid),
-        categories,
-        title,
-        content,
-      })
-    );
+    const result = await updateBlogpost({
+      uid,
+      title,
+      content,
+      categories,
+    });
+
+    if (result === TARGET_NOT_FOUND) {
+      throw new Error('not found');
+    }
 
     return {
       status: 202,
@@ -64,10 +27,12 @@ exports.handler = async (req) => {
   } catch (err) {
     console.log(err);
 
+    const status = err.message === 'not found' ? 404 : 500;
+
     return {
-      statud: 500,
       type: 'application/json',
       body: JSON.stringify({ error: true }),
+      status,
     };
   }
 };

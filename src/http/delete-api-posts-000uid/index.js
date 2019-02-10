@@ -1,35 +1,20 @@
-const data = require('@architect/data');
-
-class NoUidError extends Error {}
-
-const getCreatedAt = async (uid) => {
-  const {
-    Items: [{ createdAt } = {}],
-  } = await data.blog.query({
-    KeyConditionExpression: 'kind = :kind',
-    ProjectionExpression: 'createdAt',
-    FilterExpression: 'uid = :uid',
-    ExpressionAttributeValues: {
-      ':kind': 'blogpost',
-      ':uid': uid,
-    },
-  });
-  return createdAt;
-};
+const NoUidError = require('@architect/shared/no-uid-error');
+const { deleteByUidForKind } = require('@architect/shared/model');
 
 exports.handler = async (req) => {
   console.log();
   console.log(req);
 
+  const { uid } = req.params;
+
   try {
-    if (!req.params.uid) {
+    if (!uid) {
       throw NoUidError();
     }
 
-    const createdAt = await getCreatedAt(req.params.uid);
-    await data.blog.delete({
+    await deleteByUidForKind({
       kind: 'blogpost',
-      createdAt,
+      uid,
     });
 
     return {
@@ -44,7 +29,7 @@ exports.handler = async (req) => {
 
     return {
       type: 'application/json',
-      params: uid.stringify({ error, type }),
+      body: JSON.stringify({ error, type }),
       status,
     };
   }

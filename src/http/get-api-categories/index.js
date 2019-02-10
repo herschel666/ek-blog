@@ -1,16 +1,12 @@
-const data = require('@architect/data');
+const { getCategories } = require('@architect/shared/model');
 
 exports.handler = async (req) => {
   console.log();
   console.log(req);
 
   try {
-    const { Items: categories } = await data.blog.query({
-      KeyConditionExpression: 'kind = :kind',
-      ProjectionExpression: 'uid, title',
-      ExpressionAttributeValues: {
-        ':kind': 'category',
-      },
+    const categories = await getCategories({
+      values: ['uid', 'title'],
     });
 
     return {
@@ -21,7 +17,7 @@ exports.handler = async (req) => {
     console.log(err);
 
     return {
-      statud: 500,
+      status: 500,
       type: 'application/json',
       body: JSON.stringify({ error: true }),
     };
