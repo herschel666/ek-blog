@@ -11,6 +11,7 @@ get /posts/:slug
 get /categories
 get /categories/:slug
 get /feed.xml
+get /robots.txt
 get /assets/:file
 get /admin
 get /api/posts
