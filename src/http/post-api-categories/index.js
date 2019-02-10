@@ -1,3 +1,4 @@
+const withAuth = require('@architect/shared/with-auth');
 const {
   CATEGORY_ALREADY_EXISTS,
   createCategory,
@@ -17,7 +18,7 @@ const getErrorType = (err) => {
   }
 };
 
-exports.handler = async (req) => {
+exports.handler = withAuth(async (req) => {
   console.log();
   console.log(req);
 
@@ -50,4 +51,4 @@ exports.handler = async (req) => {
   return {
     status: 202,
   };
-};
+});

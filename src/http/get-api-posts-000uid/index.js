@@ -1,6 +1,7 @@
+const withAuth = require('@architect/shared/with-auth');
 const { getBlogpostByUid } = require('@architect/shared/data');
 
-exports.handler = async (req) => {
+exports.handler = withAuth(async (req) => {
   console.log();
   console.log(req);
 
@@ -25,4 +26,4 @@ exports.handler = async (req) => {
       body: JSON.stringify({ error: true }),
     };
   }
-};
+});

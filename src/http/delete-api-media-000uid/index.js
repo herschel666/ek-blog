@@ -1,8 +1,9 @@
 const NoUidError = require('@architect/shared/no-uid-error');
+const withAuth = require('@architect/shared/with-auth');
 const { deleteMediaByUid } = require('@architect/shared/data');
 const { deleteFile } = require('@architect/shared/util');
 
-exports.handler = async (req) => {
+exports.handler = withAuth(async (req) => {
   console.log();
   console.log(req);
 
@@ -32,4 +33,4 @@ exports.handler = async (req) => {
       params: JSON.stringify({ error, type }),
     };
   }
-};
+});

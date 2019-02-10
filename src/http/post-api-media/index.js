@@ -1,7 +1,8 @@
+const withAuth = require('@architect/shared/with-auth');
 const { createMedia } = require('@architect/shared/data');
 const { writeFile } = require('@architect/shared/util');
 
-exports.handler = async (req) => {
+exports.handler = withAuth(async (req) => {
   const { image, description } = req.body;
 
   console.log();
@@ -31,4 +32,4 @@ exports.handler = async (req) => {
       status: 500,
     };
   }
-};
+});

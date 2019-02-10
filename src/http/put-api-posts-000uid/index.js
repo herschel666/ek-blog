@@ -1,6 +1,7 @@
+const withAuth = require('@architect/shared/with-auth');
 const { TARGET_NOT_FOUND, updateBlogpost } = require('@architect/shared/data');
 
-exports.handler = async (req) => {
+exports.handler = withAuth(async (req) => {
   console.log();
   console.log(req);
 
@@ -35,4 +36,4 @@ exports.handler = async (req) => {
       status,
     };
   }
-};
+});
