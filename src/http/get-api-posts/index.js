@@ -3,7 +3,7 @@ const {
   getPaginatedByKind,
   getBlogpostsCount,
   getLastStartKeyByOffsetForKind,
-} = require('@architect/shared/model');
+} = require('@architect/shared/data');
 
 exports.handler = async (req) => {
   console.log();

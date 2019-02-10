@@ -1,4 +1,4 @@
-const { getCategories } = require('@architect/shared/model');
+const { getCategories } = require('@architect/shared/data');
 
 exports.handler = async (req) => {
   console.log();

@@ -1,4 +1,4 @@
-const { getBlogpostByUid } = require('@architect/shared/model');
+const { getBlogpostByUid } = require('@architect/shared/data');
 
 exports.handler = async (req) => {
   console.log();

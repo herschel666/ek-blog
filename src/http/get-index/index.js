@@ -6,7 +6,7 @@ const {
   getPaginatedByKind,
   getBlogpostsCount,
   getLastStartKeyByOffsetForKind,
-} = require('@architect/shared/model');
+} = require('@architect/shared/data');
 const { getNiceDate } = require('@architect/shared/util');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');

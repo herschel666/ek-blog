@@ -1,4 +1,4 @@
-const { TARGET_NOT_FOUND, updateCategory } = require('@architect/shared/model');
+const { TARGET_NOT_FOUND, updateCategory } = require('@architect/shared/data');
 
 exports.handler = async (req) => {
   console.log();

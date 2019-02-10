@@ -3,7 +3,7 @@ const {
   MEDIA_PER_PAGE,
   getLastStartKeyByOffsetForKind,
   getPaginatedByKind,
-} = require('@architect/shared/model');
+} = require('@architect/shared/data');
 
 exports.handler = async (req) => {
   console.log();

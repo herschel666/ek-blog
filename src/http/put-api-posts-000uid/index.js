@@ -1,4 +1,4 @@
-const { TARGET_NOT_FOUND, updateBlogpost } = require('@architect/shared/model');
+const { TARGET_NOT_FOUND, updateBlogpost } = require('@architect/shared/data');
 
 exports.handler = async (req) => {
   console.log();

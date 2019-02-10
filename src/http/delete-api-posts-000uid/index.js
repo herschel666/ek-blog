@@ -1,5 +1,5 @@
 const NoUidError = require('@architect/shared/no-uid-error');
-const { deleteByUidForKind } = require('@architect/shared/model');
+const { deleteByUidForKind } = require('@architect/shared/data');
 
 exports.handler = async (req) => {
   console.log();

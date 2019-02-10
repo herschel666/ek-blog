@@ -2,7 +2,7 @@ const arc = require('@architect/functions');
 const {
   getCategoryBySlug,
   getBlogpostsByParam,
-} = require('@architect/shared/model');
+} = require('@architect/shared/data');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
 const { iterate } = require('@architect/views/util');

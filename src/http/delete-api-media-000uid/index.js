@@ -1,5 +1,5 @@
 const NoUidError = require('@architect/shared/no-uid-error');
-const { deleteMediaByUid } = require('@architect/shared/model');
+const { deleteMediaByUid } = require('@architect/shared/data');
 const { deleteFile } = require('@architect/shared/util');
 
 exports.handler = async (req) => {

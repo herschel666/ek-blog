@@ -1,7 +1,7 @@
 const {
   CATEGORY_ALREADY_EXISTS,
   createCategory,
-} = require('@architect/shared/model');
+} = require('@architect/shared/data');
 
 const SERVER_ERROR = 'server_error';
 const TITLE_MISSING = 'title_missing';

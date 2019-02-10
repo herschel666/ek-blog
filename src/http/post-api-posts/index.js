@@ -1,4 +1,4 @@
-const { createBlogpost } = require('@architect/shared/model');
+const { createBlogpost } = require('@architect/shared/data');
 
 exports.handler = async (req) => {
   console.log();

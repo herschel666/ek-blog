@@ -1,5 +1,5 @@
 const arc = require('@architect/functions');
-const { getCategories } = require('@architect/shared/model');
+const { getCategories } = require('@architect/shared/data');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
 const { iterate } = require('@architect/views/util');

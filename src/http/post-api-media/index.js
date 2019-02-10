@@ -1,4 +1,4 @@
-const { createMedia } = require('@architect/shared/model');
+const { createMedia } = require('@architect/shared/data');
 const { writeFile } = require('@architect/shared/util');
 
 exports.handler = async (req) => {
