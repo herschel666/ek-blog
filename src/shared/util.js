@@ -6,6 +6,12 @@ const slugify = require('slugify');
 const fileType = require('file-type');
 const md5 = require('md5');
 
+const {
+  BUCKET_NAME_STAGING,
+  BUCKET_NAME_PROD,
+  IMMUTABLE_CACHE_DURATION,
+} = require('./constants');
+
 const writeFile = promisify(fs.writeFile);
 const unlink = promisify(fs.unlink);
 
@@ -26,6 +32,13 @@ const pad = (num = 0, str = String(num)) => {
   return len >= 2 ? str : `0${str}`;
 };
 
+const bucketName = () => {
+  if (process.env.NODE_ENV === 'staging') {
+    return BUCKET_NAME_STAGING;
+  }
+  return BUCKET_NAME_PROD;
+};
+
 exports.getNiceDate = (dateStr) => {
   const date = new Date(dateStr);
   const year = date.getFullYear();
@@ -41,20 +54,46 @@ exports.slugify = slugify;
 
 exports.assets = (filename) => arc.http.helpers.url(`/assets/${filename}`);
 
-exports.writeFile = async (buffer) => {
-  const { ext } = fileType(buffer);
+exports.writeFile = async (s3, buffer) => {
+  const { ext, mime } = fileType(buffer);
   const filename = `${md5(buffer)}.${ext}`;
 
-  await writeFile(
-    path.resolve(process.cwd(), '..', '..', '..', 'public', 'media', filename),
-    buffer
-  );
+  if (process.env.NODE_ENV === 'testing') {
+    const filePath = path.resolve(
+      process.cwd(),
+      '..',
+      '..',
+      '..',
+      'public',
+      'media',
+      filename
+    );
+    await writeFile(filePath, buffer);
+  } else {
+    await s3
+      .putObject({
+        Body: buffer,
+        Bucket: bucketName(),
+        ContentType: mime,
+        ACL: 'public-read',
+        CacheControl: `public, max-age=${IMMUTABLE_CACHE_DURATION}`,
+        Key: `media/${filename}`,
+      })
+      .promise();
+  }
 
   return { filename, ext };
 };
 
-exports.deleteFile = async (filename) => {
-  await unlink(
-    path.resolve(process.cwd(), '..', '..', '..', 'public', 'media', filename)
-  );
+exports.deleteFile = async (s3, filename) => {
+  if (process.env.NODE_ENV === 'testing') {
+    await unlink(path.resolve(process.cwd(), 'public', 'media', filename));
+  } else {
+    await s3
+      .deleteObject({
+        Bucket: bucketName(),
+        Key: `media/${filename}`,
+      })
+      .promise();
+  }
 };

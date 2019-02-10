@@ -1,3 +1,4 @@
+const { S3 } = require('aws-sdk');
 const withAuth = require('@architect/shared/with-auth');
 const { createMedia } = require('@architect/shared/data');
 const { writeFile } = require('@architect/shared/util');
@@ -17,7 +18,7 @@ exports.handler = withAuth(async (req) => {
 
   try {
     const imageBuffer = new Buffer(image, 'base64');
-    const { filename, ext } = await writeFile(imageBuffer);
+    const { filename, ext } = await writeFile(new S3(), imageBuffer);
 
     await createMedia({ filename, ext, description });
 

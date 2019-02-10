@@ -5,6 +5,10 @@ blog
 region eu-central-1
 profile blog
 
+@static
+staging ek-blog-media-flDXLaDcW-staging
+production ek-blog-media-flDXLaDcW
+
 @http
 get /
 get /posts/:slug
@@ -30,6 +34,9 @@ put /api/categories/:uid
 delete /api/posts/:uid
 delete /api/categories/:uid
 delete /api/media/:uid
+
+@queues
+delete-media-file
 
 @tables
 blog

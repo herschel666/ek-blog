@@ -1,7 +1,7 @@
+const arc = require('@architect/functions');
 const NoUidError = require('@architect/shared/no-uid-error');
 const withAuth = require('@architect/shared/with-auth');
 const { deleteMediaByUid } = require('@architect/shared/data');
-const { deleteFile } = require('@architect/shared/util');
 
 exports.handler = withAuth(async (req) => {
   console.log();
@@ -16,7 +16,10 @@ exports.handler = withAuth(async (req) => {
 
     const filename = await deleteMediaByUid({ uid });
 
-    await deleteFile(filename);
+    await arc.queues.publish({
+      name: 'delete-media-file',
+      payload: { filename },
+    });
 
     return {
       status: 202,
