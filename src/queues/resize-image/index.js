@@ -14,8 +14,7 @@ const handler = (record, callback) => {
     return callback(new Error(`Unknown image size "${size}" given.`));
   }
 
-  console.log('Resize to size', size, ...dimensions);
-
+  // TODO: handle portrait mode images correctly
   gm(buffer, record.fileName)
     .resize(...dimensions)
     .toBuffer(ext.toUpperCase(), (err, resized) => {
