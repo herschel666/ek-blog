@@ -22,7 +22,7 @@ exports.handler = withAuth(async (req) => {
     });
     const { items: media = [], hasNextPage } = await getPaginatedByKind({
       kind: 'media',
-      values: ['uid', 'filename', 'description'],
+      values: ['uid', 'filehash', 'ext', 'description'],
       limit,
       startKey,
     });
@@ -31,9 +31,11 @@ exports.handler = withAuth(async (req) => {
     return {
       type: 'application/json',
       body: JSON.stringify({
-        media: media.map(({ uid, filename, description = '' }) => ({
-          filePath: arc.http.helpers.static(`/media/${filename}`),
+        media: media.map(({ uid, filehash, ext, description = '' }) => ({
+          root: arc.http.helpers.static('/media/'),
           description,
+          filehash,
+          ext,
           uid,
         })),
         nextPage,

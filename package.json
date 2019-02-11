@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack",
     "watch": "webpack --watch",
-    "clean:media": "rm -rf ./public/media/*.{png,gif,jpg}"
+    "clean:media": "rm -rf ./public/media/*.{png,gif,jpg,pdf}"
   },
   "keywords": [],
   "author": "Emanuel Kluge",

@@ -3,6 +3,8 @@
   "dependencies": {
     "@architect/data": "^2.0.13",
     "@architect/functions": "^1.12.1",
-    "aws-sdk": "^2.400.0"
+    "aws-sdk": "^2.400.0",
+    "file-type": "^10.7.1",
+    "md5": "^2.2.1"
   }
 }

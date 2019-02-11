@@ -1,0 +1,7 @@
+{
+  "name": "blog-finish-image-upload",
+  "dependencies": {
+    "@architect/data": "^2.0.14",
+    "@architect/functions": "^2.0.7"
+  }
+}

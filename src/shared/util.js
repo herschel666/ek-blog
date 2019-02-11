@@ -3,8 +3,6 @@ const fs = require('fs');
 const { promisify } = require('util');
 const arc = require('@architect/functions');
 const slugify = require('slugify');
-const fileType = require('file-type');
-const md5 = require('md5');
 
 const {
   BUCKET_NAME_STAGING,
@@ -54,16 +52,10 @@ exports.slugify = slugify;
 
 exports.assets = (filename) => arc.http.helpers.url(`/assets/${filename}`);
 
-exports.writeFile = async (s3, buffer) => {
-  const { ext, mime } = fileType(buffer);
-  const filename = `${md5(buffer)}.${ext}`;
-
+exports.writeFile = async ({ s3, buffer, filename, mime }) => {
   if (process.env.NODE_ENV === 'testing') {
     const filePath = path.resolve(
-      process.cwd(),
-      '..',
-      '..',
-      '..',
+      process.env.CURDIR,
       'public',
       'media',
       filename
@@ -81,8 +73,6 @@ exports.writeFile = async (s3, buffer) => {
       })
       .promise();
   }
-
-  return { filename, ext };
 };
 
 exports.deleteFile = async (s3, filename) => {

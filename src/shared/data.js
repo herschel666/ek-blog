@@ -381,26 +381,38 @@ exports.deleteByUidForKind = async ({ uid, kind }) => {
   });
 };
 
-exports.createMedia = async ({ filename, ext, description }) => {
+exports.createMedia = async ({ filehash, ext, description }) => {
   const uid = `m${shortid.generate()}`;
   const createdAt = new Date().toISOString();
 
   await data.blog.put({
     kind: 'media',
     createdAt,
-    filename,
+    filehash,
     description,
     uid,
     ext,
+  });
+
+  return createdAt;
+};
+
+exports.finishImageUpload = async ({ filehash, createdAt }) => {
+  await data.blog.update({
+    Key: { kind: 'media', createdAt },
+    UpdateExpression: `SET filehash = :filehash`,
+    ExpressionAttributeValues: {
+      ':filehash': filehash,
+    },
   });
 };
 
 exports.deleteMediaByUid = async ({ uid }) => {
   const {
-    Items: [{ filename, createdAt } = {}],
+    Items: [{ filehash, ext, createdAt } = {}],
   } = await data.blog.query({
     KeyConditionExpression: 'kind = :kind',
-    ProjectionExpression: 'filename, createdAt',
+    ProjectionExpression: 'filehash, ext, createdAt',
     FilterExpression: 'uid = :uid',
     ExpressionAttributeValues: {
       ':kind': 'media',
@@ -412,5 +424,5 @@ exports.deleteMediaByUid = async ({ uid }) => {
     createdAt,
   });
 
-  return filename;
+  return { filehash, ext };
 };

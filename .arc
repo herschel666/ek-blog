@@ -37,6 +37,8 @@ delete /api/media/:uid
 
 @queues
 delete-media-file
+resize-image
+finish-image-upload
 
 @tables
 blog

@@ -14,11 +14,11 @@ exports.handler = withAuth(async (req) => {
       throw NoUidError();
     }
 
-    const filename = await deleteMediaByUid({ uid });
+    const { filehash, ext } = await deleteMediaByUid({ uid });
 
     await arc.queues.publish({
       name: 'delete-media-file',
-      payload: { filename },
+      payload: { filehash, ext },
     });
 
     return {
