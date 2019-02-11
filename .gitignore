@@ -4,4 +4,5 @@ src/views/layouts
 public/media/*.jpg
 public/media/*.png
 public/media/*.gif
+public/media/*.pdf
 .arc-env

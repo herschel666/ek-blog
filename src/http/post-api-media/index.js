@@ -4,21 +4,21 @@ const { createMedia } = require('@architect/shared/data');
 const { writeFile } = require('@architect/shared/util');
 
 exports.handler = withAuth(async (req) => {
-  const { image, description } = req.body;
+  const { media, description } = req.body;
 
   console.log();
   console.log(
     Object.assign(req, {
       body: {
-        image: image.substring(0, 32),
+        media: media.substring(0, 32),
         description,
       },
     })
   );
 
   try {
-    const imageBuffer = new Buffer(image, 'base64');
-    const { filename, ext } = await writeFile(new S3(), imageBuffer);
+    const mediaBuffer = new Buffer(media, 'base64');
+    const { filename, ext } = await writeFile(new S3(), mediaBuffer);
 
     await createMedia({ filename, ext, description });
 
