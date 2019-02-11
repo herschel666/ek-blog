@@ -77,7 +77,7 @@ exports.writeFile = async ({ s3, buffer, filename, mime }) => {
 
 exports.deleteFile = async (s3, filename) => {
   if (process.env.NODE_ENV === 'testing') {
-    await unlink(path.resolve(process.cwd(), 'public', 'media', filename));
+    await unlink(path.resolve(process.env.CURDIR, 'public', 'media', filename));
   } else {
     await s3
       .deleteObject({

@@ -16,6 +16,7 @@ exports.handler = withAuth(async (req) => {
 
     const { filehash, ext } = await deleteMediaByUid({ uid });
 
+    // TODO: deleet all sizes
     await arc.queues.publish({
       name: 'delete-media-file',
       payload: { filehash, ext },
