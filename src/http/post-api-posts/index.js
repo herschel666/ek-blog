@@ -5,6 +5,7 @@ exports.handler = withAuth(async (req) => {
   console.log();
   console.log(req);
 
+  // TODO: add validation
   const { title, content, createdAt } = req.body;
   const categories = [].concat(req.body.categories).filter(Boolean);
 
