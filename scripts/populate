@@ -1,13 +1,36 @@
 #!/usr/bin/env bash
 
-echo "Creating category 'Foobar'..."
-curl -H 'Content-type: application/json' -d '{"title": "Foobar"}' http://localhost:3333/api/categories
+while read img
+do
+  name="$(basename $img)"
+  echo "Creating image $name..."
+  content=$(cat $img | base64)
+  curl -H 'Content-type: application/json' \
+    -d '{"media": "'$content'", "description": "Image '$name'"}' \
+    http://localhost:3333/api/media &
+done < <(ls -d ./scripts/fixture/*)
 
-echo "Creating category 'Swag'..."
-curl -H 'Content-type: application/json' -d '{"title": "Swag"}' http://localhost:3333/api/categories
+CATEGORY_NAMES=("Foobar" "Swag" "Geloet")
 
-echo "Creating category 'Geloet'..."
-curl -H 'Content-type: application/json' -d '{"title": "Geloet"}' http://localhost:3333/api/categories
+for cat in "${CATEGORY_NAMES[@]}"
+do
+  echo "Creating category '$cat'..."
+  curl -H 'Content-type: application/json' \
+    -d '{"title": "'$cat'"}' \
+    http://localhost:3333/api/categories &
+done
+
+META=0
+
+for job in `jobs -p`
+  do
+    wait $job || let "META+=1"
+  done
+
+if [ "$META" != "0" ];
+  then
+    exit 1;
+  fi
 
 CATEGORIES="$(curl -s http://localhost:3333/api/categories)"
 
@@ -19,7 +42,7 @@ POST_1="{
   \"categories\": [\"$CAT_1\"],
   \"createdAt\": \"2017-05-10T15:05:00.000Z\"
 }"
-curl -H 'Content-type: application/json' -d "$POST_1" http://localhost:3333/api/posts
+curl -H 'Content-type: application/json' -d "$POST_1" http://localhost:3333/api/posts &
 
 CAT_2="$(echo $CATEGORIES | jq '.[1].uid' | sed 's/"//g')"
 echo "Creating post 2 in category $(echo $CATEGORIES | jq '.[1].title')..."
@@ -29,7 +52,7 @@ POST_2="{
   \"categories\": [\"$CAT_2\"],
   \"createdAt\": \"2018-03-24T08:36:02.000Z\"
 }"
-curl -H 'Content-type: application/json' -d "$POST_2" http://localhost:3333/api/posts
+curl -H 'Content-type: application/json' -d "$POST_2" http://localhost:3333/api/posts &
 
 CAT_3="$(echo $CATEGORIES | jq '.[2].uid' | sed 's/"//g')"
 echo "Creating post 3 in categories $(echo $CATEGORIES | jq '.[0].title') and $(echo $CATEGORIES | jq '.[2].title')..."
@@ -39,7 +62,7 @@ POST_3="{
   \"categories\": [\"$CAT_1\", \"$CAT_3\"],
   \"createdAt\": \"2018-03-28T09:18:02.000Z\"
 }"
-curl -H 'Content-type: application/json' -d "$POST_3" http://localhost:3333/api/posts
+curl -H 'Content-type: application/json' -d "$POST_3" http://localhost:3333/api/posts &
 
 echo "Creating post 4 in category $(echo $CATEGORIES | jq '.[1].title')..."
 POST_4="{
@@ -48,7 +71,7 @@ POST_4="{
   \"categories\": [\"$CAT_2\"],
   \"createdAt\": \"2018-04-02T13:04:02.000Z\"
 }"
-curl -H 'Content-type: application/json' -d "$POST_4" http://localhost:3333/api/posts
+curl -H 'Content-type: application/json' -d "$POST_4" http://localhost:3333/api/posts &
 
 echo "Creating post 5 in category $(echo $CATEGORIES | jq '.[0].title')..."
 POST_5="{
@@ -57,7 +80,7 @@ POST_5="{
   \"categories\": [\"$CAT_1\"],
   \"createdAt\": \"2018-05-02T13:05:02.000Z\"
 }"
-curl -H 'Content-type: application/json' -d "$POST_5" http://localhost:3333/api/posts
+curl -H 'Content-type: application/json' -d "$POST_5" http://localhost:3333/api/posts &
 
 echo "Creating post 6 in category $(echo $CATEGORIES | jq '.[2].title')..."
 POST_6="{
@@ -66,7 +89,7 @@ POST_6="{
   \"categories\": [\"$CAT_3\"],
   \"createdAt\": \"2018-06-02T13:06:02.000Z\"
 }"
-curl -H 'Content-type: application/json' -d "$POST_6" http://localhost:3333/api/posts
+curl -H 'Content-type: application/json' -d "$POST_6" http://localhost:3333/api/posts &
 
 echo "Creating post 7 in categories $(echo $CATEGORIES | jq '.[1].title') and $(echo $CATEGORIES | jq '.[2].title')..."
 POST_7="{
@@ -75,4 +98,16 @@ POST_7="{
   \"categories\": [\"$CAT_2\", \"$CAT_3\"],
   \"createdAt\": \"2018-07-02T13:07:02.000Z\"
 }"
-curl -H 'Content-type: application/json' -d "$POST_7" http://localhost:3333/api/posts
+curl -H 'Content-type: application/json' -d "$POST_7" http://localhost:3333/api/posts &
+
+POSTS=0
+
+for job in `jobs -p`
+  do
+    wait $job || let "POSTS+=1"
+  done
+
+if [ "$POSTS" != "0" ];
+  then
+    exit 1;
+  fi
