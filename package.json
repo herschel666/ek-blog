@@ -12,7 +12,7 @@
   "author": "Emanuel Kluge",
   "license": "MIT",
   "dependencies": {
-    "@architect/architect": "^5.5.2",
+    "@architect/architect": "^5.5.3",
     "@ek-blog/install-sharp-bindings": "file:./plugins/install-sharp-bindings",
     "bcryptjs": "^2.4.3",
     "marked": "^0.6.0",
