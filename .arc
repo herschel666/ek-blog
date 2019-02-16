@@ -49,3 +49,6 @@ blog
 blog
   kind *String
   params **String
+
+@plugins
+ek-blog/install-sharp-bindings

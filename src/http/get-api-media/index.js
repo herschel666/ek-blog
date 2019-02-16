@@ -32,7 +32,7 @@ exports.handler = withAuth(async (req) => {
       type: 'application/json',
       body: JSON.stringify({
         media: media.map(({ uid, filehash, ext, description = '' }) => ({
-          root: arc.http.helpers.static('/media/'),
+          root: arc.http.helpers.static('/_static/media/'),
           description,
           filehash,
           ext,
