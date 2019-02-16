@@ -397,6 +397,22 @@ exports.createMedia = async ({ filehash, ext, description }) => {
   return createdAt;
 };
 
+exports.getMediaByUid = async ({ uid, values }) => {
+  const {
+    Items: [media],
+  } = await data.blog.query({
+    KeyConditionExpression: 'kind = :kind',
+    FilterExpression: 'uid = :uid',
+    ProjectionExpression: values.join(', '),
+    ExpressionAttributeValues: {
+      ':kind': 'media',
+      ':uid': uid,
+    },
+  });
+
+  return media || null;
+};
+
 exports.finishImageUpload = async ({ filehash, createdAt }) => {
   await data.blog.update({
     Key: { kind: 'media', createdAt },

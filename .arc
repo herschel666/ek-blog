@@ -22,6 +22,7 @@ get /api/posts
 get /api/posts/:uid
 get /api/categories
 get /api/media
+get /api/media/:uid
 
 post /admin
 post /api/posts
