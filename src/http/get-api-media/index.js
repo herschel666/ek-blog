@@ -11,11 +11,11 @@ exports.handler = withAuth(async (req) => {
   console.log(req);
 
   try {
-    const limitParam = parseInt(req.params.limit, 10);
-    const pageParam = parseInt(req.params.page, 10);
+    const limitParam = parseInt(req.query.limit, 10);
+    const pageParam = parseInt(req.query.page, 10);
     const limit = Number.isNaN(limitParam) ? MEDIA_PER_PAGE : limitParam;
     const currentPage = Number.isNaN(pageParam) ? 1 : pageParam;
-    const offset = (currentPage - 1) * limitParam;
+    const offset = (currentPage - 1) * limit;
     const startKey = await getLastStartKeyByOffsetForKind({
       kind: 'media',
       offset,
