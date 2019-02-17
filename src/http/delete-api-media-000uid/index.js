@@ -1,6 +1,6 @@
 const arc = require('@architect/functions');
 const NoUidError = require('@architect/shared/no-uid-error');
-const withAuth = require('@architect/shared/with-auth');
+const withAuth = require('@architect/shared/middlewares/with-auth');
 const { deleteMediaByUid } = require('@architect/shared/data');
 const {
   IMAGE_SIZE_THUMB,
@@ -11,7 +11,7 @@ const {
 
 const sizes = [IMAGE_SIZE_THUMB, IMAGE_SIZE_S, IMAGE_SIZE_M, IMAGE_SIZE_L];
 
-exports.handler = withAuth(async (req) => {
+exports.handler = arc.middleware(withAuth, async (req) => {
   console.log();
   console.log(req);
 

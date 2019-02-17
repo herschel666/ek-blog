@@ -1,6 +1,7 @@
 const arc = require('@architect/functions');
 const bcrypt = require('bcryptjs');
 
+// TODO: throttle retries after certain amount of failures
 const login = async (req) => {
   const { token = '' } = req.body;
   const session = await arc.http.session.read(req);

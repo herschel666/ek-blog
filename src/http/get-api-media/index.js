@@ -1,12 +1,12 @@
 const arc = require('@architect/functions');
-const withAuth = require('@architect/shared/with-auth');
+const withAuth = require('@architect/shared/middlewares/with-auth');
 const {
   MEDIA_PER_PAGE,
   getLastStartKeyByOffsetForKind,
   getPaginatedByKind,
 } = require('@architect/shared/data');
 
-exports.handler = withAuth(async (req) => {
+exports.handler = arc.middleware(withAuth, async (req) => {
   console.log();
   console.log(req);
 

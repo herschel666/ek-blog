@@ -2,7 +2,7 @@ const arc = require('@architect/functions');
 const { S3 } = require('aws-sdk');
 const fileType = require('file-type');
 const md5 = require('md5');
-const withAuth = require('@architect/shared/with-auth');
+const withAuth = require('@architect/shared/middlewares/with-auth');
 const { createMedia } = require('@architect/shared/data');
 const { writeFile } = require('@architect/shared/util');
 const {
@@ -26,7 +26,7 @@ const deferResizing = (args) =>
     });
   }, Promise.resolve());
 
-exports.handler = withAuth(async (req) => {
+exports.handler = arc.middleware(withAuth, async (req) => {
   const { media, description } = req.body;
 
   console.log();
