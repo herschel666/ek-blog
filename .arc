@@ -5,9 +5,12 @@ blog
 region eu-central-1
 profile blog
 
+@domain
+ek-blog.de
+
 @static
-staging ek-blog-media-flDXLaDcW-staging
-production ek-blog-media-flDXLaDcW
+staging ek-blog-media-fldxladcw-staging
+production ek-blog-media-fldxladcw
 
 @http
 get /
