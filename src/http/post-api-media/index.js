@@ -2,6 +2,7 @@ const arc = require('@architect/functions');
 const { S3 } = require('aws-sdk');
 const fileType = require('file-type');
 const Validator = require('fastest-validator');
+const sanitizeHtml = require('sanitize-html');
 const md5 = require('md5');
 const withAuth = require('@architect/shared/middlewares/with-auth');
 const { createMedia } = require('@architect/shared/data');
@@ -34,7 +35,10 @@ const deferResizing = (args) =>
 const check = getMediaCheck(new Validator(getMediaCheck.options));
 
 exports.handler = arc.middleware(withAuth, async (req) => {
-  const { media, description } = req.body;
+  const { media, description: dirtyDescription } = req.body;
+  const description = dirtyDescription
+    ? sanitizeHtml(dirtyDescription).trim()
+    : undefined;
 
   console.log();
   console.log(
@@ -46,7 +50,9 @@ exports.handler = arc.middleware(withAuth, async (req) => {
     })
   );
 
-  const result = check({ media, description });
+  const result = check(
+    Object.assign({ media }, description ? { description } : undefined)
+  );
 
   if (Array.isArray(result)) {
     return {
@@ -65,6 +71,14 @@ exports.handler = arc.middleware(withAuth, async (req) => {
     const { ext, mime } = fileType(mediaBuffer);
     const filename = `${filehash}.${ext}`;
     const isPdf = ext === 'pdf';
+    const payload = {
+      filehash: isPdf ? filehash : 'processing',
+      ext,
+    };
+
+    if (description) {
+      payload.description = description;
+    }
 
     await writeFile({
       s3: new S3(),
@@ -73,11 +87,7 @@ exports.handler = arc.middleware(withAuth, async (req) => {
       mime,
     });
 
-    const createdAt = await createMedia({
-      filehash: isPdf ? filehash : 'processing',
-      description,
-      ext,
-    });
+    const createdAt = await createMedia(payload);
 
     if (!isPdf) {
       await deferResizing({

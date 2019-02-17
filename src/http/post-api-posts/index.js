@@ -1,5 +1,6 @@
 const arc = require('@architect/functions');
 const Validator = require('fastest-validator');
+const sanitizeHtml = require('sanitize-html');
 const withAuth = require('@architect/shared/middlewares/with-auth');
 const { getBlogpostCheck } = require('@architect/shared/validate');
 const { createBlogpost } = require('@architect/shared/data');
@@ -14,7 +15,8 @@ exports.handler = arc.middleware(withAuth, async (req) => {
   console.log();
   console.log(req);
 
-  const { title, content, createdAt } = req.body;
+  const { title: dirtyTitle = '', content, createdAt } = req.body;
+  const title = sanitizeHtml(dirtyTitle);
   const categories = [].concat(req.body.categories).filter(Boolean);
   const result = check({
     title,

@@ -1,4 +1,5 @@
 const arc = require('@architect/functions');
+const sanitizeHtml = require('sanitize-html');
 const {
   SERVER_ERROR,
   NOT_FOUND_ERROR,
@@ -18,7 +19,8 @@ exports.handler = arc.middleware(withAuth, async (req) => {
   console.log(req);
 
   const { uid } = req.params;
-  const { title } = req.body;
+  const { title: dirtyTitle = '' } = req.body;
+  const title = sanitizeHtml(dirtyTitle);
 
   try {
     check({ title, uid });

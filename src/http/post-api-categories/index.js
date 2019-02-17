@@ -1,4 +1,5 @@
 const arc = require('@architect/functions');
+const sanitizeHtml = require('sanitize-html');
 const withAuth = require('@architect/shared/middlewares/with-auth');
 const {
   CATEGORY_ALREADY_EXISTS,
@@ -20,7 +21,8 @@ exports.handler = arc.middleware(withAuth, async (req) => {
   console.log();
   console.log(req);
 
-  const { title } = req.body;
+  const { title: dirtyTitle = '' } = req.body;
+  const title = sanitizeHtml(dirtyTitle);
 
   try {
     check({ title });

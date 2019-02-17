@@ -7,71 +7,70 @@ const {
   getBlogpostsCount,
   getLastStartKeyByOffsetForKind,
 } = require('@architect/shared/data');
+const { MARKED_OPTIONS } = require('@architect/shared/constants');
 const { getNiceDate } = require('@architect/shared/util');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
 const { iterate } = require('@architect/views/util');
+
+marked.setOptions(MARKED_OPTIONS);
 
 const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
   layout(
     html`
       <p><a href="${arc.http.helpers.url('/categories')}">All categories</a></p>
       <hr />
-      ${
-        hasPosts
-          ? html`
-              <h1>Posts</h1>
-              ${
-                iterate(
-                  posts,
-                  ({ content, title, slug, createdAt }) =>
-                    html`
-                      <div>
-                        <h2>
-                          <a href="${arc.http.helpers.url(`/posts/${slug}`)}">
-                            ${title}
-                          </a>
-                        </h2>
-                        <strong>
-                          Created at
-                          <time datetime="${createdAt}">
-                            ${getNiceDate(createdAt)}
-                          </time>
-                        </strong>
-                        ${marked(content)}
-                      </div>
-                    `
-                )
-              }
-              <div>
-                ${
-                  prevPage
-                    ? html`
-                        <a href="${arc.http.helpers.url(`/?page=${prevPage}`)}">
-                          Prev page
-                        </a>
-                      `
-                    : ''
-                }
-                ${
-                  nextPage
-                    ? html`
-                        <a href="${arc.http.helpers.url(`/?page=${nextPage}`)}">
-                          Next page
-                        </a>
-                      `
-                    : ''
-                }
-              </div>
-            `
-          : html`
-              <h1>Es gibt noch keine Beiträge.</h1>
-            `
-      }
+      ${hasPosts
+        ? html`
+            <h1>Posts</h1>
+            ${iterate(
+              posts,
+              ({ content, title, slug, createdAt }) =>
+                html`
+                  <div>
+                    <h2>
+                      <a href="${arc.http.helpers.url(`/posts/${slug}`)}">
+                        ${title}
+                      </a>
+                    </h2>
+                    <strong>
+                      Created at
+                      <time datetime="${createdAt}">
+                        ${getNiceDate(createdAt)}
+                      </time>
+                    </strong>
+                    ${marked(content)}
+                  </div>
+                `
+            )}
+            <div>
+              ${prevPage
+                ? html`
+                    <a href="${arc.http.helpers.url(`/?page=${prevPage}`)}">
+                      Prev page
+                    </a>
+                  `
+                : ''}
+              ${nextPage
+                ? html`
+                    <a href="${arc.http.helpers.url(`/?page=${nextPage}`)}">
+                      Next page
+                    </a>
+                  `
+                : ''}
+            </div>
+          `
+        : html`
+            <h1>Es gibt noch keine Beiträge.</h1>
+          `}
       <hr />
       <details>
         <summary>Rohdaten</summary>
-        <pre>${raw}</pre>
+        <pre>
+          <code>
+            ${raw}
+          </code>
+        </pre>
       </details>
     `
   );
