@@ -22,6 +22,23 @@ marked.setOptions(
   })
 );
 
+const printDbDump = (dump) => {
+  if (process.env.NODE_ENV === 'testing') {
+    return html`
+      <hr />
+      <details>
+        <summary>Rohdaten</summary>
+        <pre>
+          <code>
+            ${dump}
+          </code>
+        </pre>
+      </details>
+    `;
+  }
+  return '';
+};
+
 const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
   layout(
     html`
@@ -70,15 +87,7 @@ const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
         : html`
             <h1>Es gibt noch keine Beiträge.</h1>
           `}
-      <hr />
-      <details>
-        <summary>Rohdaten</summary>
-        <pre>
-          <code>
-            ${raw}
-          </code>
-        </pre>
-      </details>
+      ${printDbDump(raw)}
     `
   );
 
