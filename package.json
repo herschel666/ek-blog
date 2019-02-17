@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack",
+    "build": "NODE_ENV=production webpack",
     "watch": "webpack --watch",
+    "clean:assets": "rm -rf ./src/http/get-assets-000file/files/*.{css,js}",
     "clean:media": "rm -rf ./public/media/*.{png,gif,jpg,pdf}"
   },
   "keywords": [],
