@@ -15,3 +15,11 @@ exports.IMAGE_SIZES = {
   [IMAGE_SIZE_M]: [1000, undefined],
   [IMAGE_SIZE_L]: [2000, undefined],
 };
+
+exports.SERVER_ERROR = 'ServerError';
+exports.NOT_FOUND_ERROR = 'NotFoundError';
+exports.VALIDATION_ERROR = 'ValidationError';
+exports.TITLE_MISSING_ERROR = 'TitleMissingError';
+exports.TITLE_TOO_SHORT_ERROR = 'TitleTooShortError';
+exports.TITLE_TOO_LONG_ERROR = 'TitleTooLongError';
+exports.ALREADY_EXISTS_ERROR = 'AlreadyExistsError';

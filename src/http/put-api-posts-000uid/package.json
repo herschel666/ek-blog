@@ -2,6 +2,7 @@
   "name": "blog-put-api-posts-000uid",
   "dependencies": {
     "@architect/data": "^2.0.12",
-    "@architect/functions": "^1.12.1"
+    "@architect/functions": "^1.12.1",
+    "fastest-validator": "^0.6.15"
   }
 }

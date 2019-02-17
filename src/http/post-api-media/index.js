@@ -1,15 +1,20 @@
 const arc = require('@architect/functions');
 const { S3 } = require('aws-sdk');
 const fileType = require('file-type');
+const Validator = require('fastest-validator');
 const md5 = require('md5');
 const withAuth = require('@architect/shared/middlewares/with-auth');
 const { createMedia } = require('@architect/shared/data');
+const { getMediaCheck } = require('@architect/shared/validate');
 const { writeFile } = require('@architect/shared/util');
 const {
   IMAGE_SIZE_THUMB,
   IMAGE_SIZE_S,
   IMAGE_SIZE_M,
   IMAGE_SIZE_L,
+
+  SERVER_ERROR,
+  VALIDATION_ERROR,
 } = require('@architect/shared/constants');
 
 const sizes = [IMAGE_SIZE_THUMB, IMAGE_SIZE_S, IMAGE_SIZE_M, IMAGE_SIZE_L];
@@ -26,6 +31,8 @@ const deferResizing = (args) =>
     });
   }, Promise.resolve());
 
+const check = getMediaCheck(new Validator(getMediaCheck.options));
+
 exports.handler = arc.middleware(withAuth, async (req) => {
   const { media, description } = req.body;
 
@@ -38,6 +45,19 @@ exports.handler = arc.middleware(withAuth, async (req) => {
       },
     })
   );
+
+  const result = check({ media, description });
+
+  if (Array.isArray(result)) {
+    return {
+      status: 400,
+      type: 'application/json',
+      body: JSON.stringify({
+        type: VALIDATION_ERROR,
+        body: { errors: result },
+      }),
+    };
+  }
 
   try {
     const mediaBuffer = new Buffer(media, 'base64');
@@ -72,13 +92,24 @@ exports.handler = arc.middleware(withAuth, async (req) => {
     }
 
     return {
-      status: 201,
+      status: 200,
+      type: 'application/json',
+      body: JSON.stringify({
+        type: 'successs',
+      }),
     };
   } catch (err) {
     console.log(err);
 
     return {
       status: 500,
+      type: 'application/json',
+      body: JSON.stringify({
+        type: SERVER_ERROR,
+        body: {
+          errors: [{ message: 'Something went wrong.' }],
+        },
+      }),
     };
   }
 });

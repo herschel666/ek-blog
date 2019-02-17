@@ -4,20 +4,17 @@ const {
   CATEGORY_ALREADY_EXISTS,
   createCategory,
 } = require('@architect/shared/data');
+const {
+  SERVER_ERROR,
+  ALREADY_EXISTS_ERROR,
+} = require('@architect/shared/constants');
+const {
+  getCategoryCheck,
+  getCategoryErrorMessage,
+  getErrorType,
+} = require('@architect/shared/validate');
 
-const SERVER_ERROR = 'server_error';
-const TITLE_MISSING = 'title_missing';
-const ALREADY_EXISTS = 'already_exists';
-
-const getErrorType = (err) => {
-  switch (err.message) {
-    case TITLE_MISSING:
-    case ALREADY_EXISTS:
-      return err.message;
-    default:
-      return SERVER_ERROR;
-  }
-};
+const check = getCategoryCheck();
 
 exports.handler = arc.middleware(withAuth, async (req) => {
   console.log();
@@ -26,30 +23,35 @@ exports.handler = arc.middleware(withAuth, async (req) => {
   const { title } = req.body;
 
   try {
-    if (!title) {
-      throw new Error(TITLE_MISSING);
-    }
+    check({ title });
 
     const result = await createCategory({ title });
 
     if (result === CATEGORY_ALREADY_EXISTS) {
-      throw new Error(ALREADY_EXISTS);
+      throw new Error(ALREADY_EXISTS_ERROR);
     }
+
+    return {
+      status: 200,
+      type: 'application/json',
+      body: JSON.stringify({ type: 'success' }),
+    };
   } catch (err) {
     console.log(err);
 
-    const error = true;
-    const type = getErrorType(err);
+    const type = getErrorType(err.message);
     const status = type === SERVER_ERROR ? 500 : 400;
+    const errors = [
+      {
+        field: 'title',
+        message: getCategoryErrorMessage(type),
+      },
+    ];
 
     return {
       type: 'application/json',
-      body: JSON.stringify({ error, type }),
+      body: JSON.stringify({ body: { errors }, type }),
       status,
     };
   }
-
-  return {
-    status: 202,
-  };
 });
