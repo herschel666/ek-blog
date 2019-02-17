@@ -32,6 +32,8 @@ if [ "$META" != "0" ];
     exit 1;
   fi
 
+sleep 1
+
 CATEGORIES="$(curl -s http://localhost:3333/api/categories)"
 
 CAT_1="$(echo $CATEGORIES | jq '.[0].uid' | sed 's/"//g')"
