@@ -1,14 +1,21 @@
 const marked = require('marked');
 const arc = require('@architect/functions');
-const { MARKED_OPTIONS } = require('@architect/shared/constants');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
+const {
+  extendMarkdownRenderer,
+  getMarkedOptions,
+} = require('@architect/views/markdown');
 const { getBlogpostBySlug } = require('@architect/shared/data');
 const { getNiceDate } = require('@architect/shared/util');
 const { iterate } = require('@architect/views/util');
 const get404 = require('@architect/views/partials/get-404');
 
-marked.setOptions(MARKED_OPTIONS);
+marked.setOptions(
+  getMarkedOptions({
+    renderer: extendMarkdownRenderer(new marked.Renderer()),
+  })
+);
 
 const getBody = ({ title, content, createdAt, categories }) =>
   layout(

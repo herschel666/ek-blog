@@ -7,13 +7,20 @@ const {
   getBlogpostsCount,
   getLastStartKeyByOffsetForKind,
 } = require('@architect/shared/data');
-const { MARKED_OPTIONS } = require('@architect/shared/constants');
 const { getNiceDate } = require('@architect/shared/util');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
+const {
+  extendMarkdownRenderer,
+  getMarkedOptions,
+} = require('@architect/views/markdown');
 const { iterate } = require('@architect/views/util');
 
-marked.setOptions(MARKED_OPTIONS);
+marked.setOptions(
+  getMarkedOptions({
+    renderer: extendMarkdownRenderer(new marked.Renderer()),
+  })
+);
 
 const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
   layout(

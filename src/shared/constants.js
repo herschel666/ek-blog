@@ -4,10 +4,6 @@ exports.BUCKET_NAME_PROD = 'ek-blog-media-flDXLaDcW';
 
 exports.IMMUTABLE_CACHE_DURATION = 60 * 60 * 24 * 365; // 1 year
 
-exports.MARKED_OPTIONS = {
-  sanitize: true,
-};
-
 const IMAGE_SIZE_THUMB = (exports.IMAGE_SIZE_THUMB = 'thumb');
 const IMAGE_SIZE_S = (exports.IMAGE_SIZE_S = 'small');
 const IMAGE_SIZE_M = (exports.IMAGE_SIZE_M = 'medium');
