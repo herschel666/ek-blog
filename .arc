@@ -49,10 +49,5 @@ blog
   kind *String
   createdAt **String
 
-@indexes
-blog
-  kind *String
-  params **String
-
 @plugins
 ek-blog/install-sharp-bindings
