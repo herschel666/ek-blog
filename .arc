@@ -6,7 +6,7 @@ region eu-central-1
 profile blog
 
 @domain
-ek-blog.de
+ekblog.de
 
 @static
 staging ek-blog-media-fldxladcw-staging
