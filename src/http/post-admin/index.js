@@ -30,7 +30,11 @@ const logout = async (req) => {
 
 exports.handler = async (req) => {
   console.log();
-  console.log(req);
+  console.log(
+    Object.assign(req, {
+      body: { action: req.body.action },
+    })
+  );
 
   const { action } = req.body;
 
