@@ -1,4 +1,3 @@
-const arc = require('@architect/functions');
 const {
   getCategoryBySlug,
   getBlogpostsByParam,
@@ -14,18 +13,16 @@ const getBody = ({ category, posts }) =>
     html`
       <h1>${category.title}</h1>
       <ol>
-        ${
-          iterate(
-            posts,
-            ({ title, slug }) => html`
-              <h2>
-                <a href="${arc.http.helpers.url(`/posts/${slug}`)}">
-                  ${title}
-                </a>
-              </h2>
-            `
-          )
-        }
+        ${iterate(
+          posts,
+          ({ title, slug }) => html`
+            <h2>
+              <a href="/posts/${slug}">
+                ${title}
+              </a>
+            </h2>
+          `
+        )}
       </ol>
     `
   );

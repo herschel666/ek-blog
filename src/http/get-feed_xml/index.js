@@ -1,26 +1,27 @@
-const arc = require('@architect/functions');
 const {
   BLOGPOSTS_PER_PAGE,
   getPaginatedByKind,
 } = require('@architect/shared/data');
 const html = require('@architect/views/html');
 
+//  TODO: use absolute URL in <link />
 const getItems = (str, blogpost) => html`
   ${str}
   <item>
     <title>${blogpost.title}</title>
-    <link>${arc.http.helpers.url(`/posts/${blogpost.slug}`)}</link>
+    <link>/posts/${blogpost.slug}</link>
     <pubDate>${blogpost.createdAt}</pubDate>
     <dc:creator><![CDATA[Emanuel]]></dc:creator>
     <description><![CDATA[${blogpost.content}]]></description>
   </item>
 `;
 
+//  TODO: use absolute URL in <link />
 const getBody = (blogposts) => html`
   <rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
     <channel>
       <title>ek|blog</title>
-      <link>${arc.http.helpers.url('/')}</link>
+      <link>/</link>
       <language>de-DE</language>
       <lastBuildDate>${new Date().toISOString()}</lastBuildDate>
       <description></description>

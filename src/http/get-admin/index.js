@@ -6,7 +6,7 @@ const html = require('@architect/views/html');
 const loggedOutBody = blog(
   'Admin',
   html`
-    <form action="${arc.http.helpers.url('/admin')}" method="post">
+    <form action="/admin" method="post">
       <input type="hidden" name="action" value="login" />
       <fieldset>
         <legend>Login</legend>
@@ -25,12 +25,6 @@ const loggedOutBody = blog(
   `
 );
 
-const loggedInBody = admin(html`
-  <script>
-    window.__blog__.baseUrl = '${arc.http.helpers.url('/')}';
-  </script>
-`);
-
 exports.handler = async (req) => {
   console.log();
   console.log(req);
@@ -39,7 +33,7 @@ exports.handler = async (req) => {
   const isLoggedIn =
     session.loggedIn ||
     (process.env.NODE_ENV === 'testing' && process.env.REQUIRE_AUTH !== 'true');
-  const body = isLoggedIn ? loggedInBody : loggedOutBody;
+  const body = isLoggedIn ? admin() : loggedOutBody;
 
   return {
     type: 'text/html; charset=utf8',

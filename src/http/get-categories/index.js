@@ -1,4 +1,3 @@
-const arc = require('@architect/functions');
 const { getCategories } = require('@architect/shared/data');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
@@ -10,20 +9,18 @@ const getBody = (categories) =>
     html`
       <h1>Kategorien</h1>
       <ol>
-        ${
-          iterate(
-            categories,
-            ({ slug, title }) => html`
-              <li>
-                <h2>
-                  <a href="${arc.http.helpers.url(`/categories/${slug}`)}">
-                    ${title}
-                  </a>
-                </h2>
-              </li>
-            `
-          )
-        }
+        ${iterate(
+          categories,
+          ({ slug, title }) => html`
+            <li>
+              <h2>
+                <a href="/categories/${slug}">
+                  ${title}
+                </a>
+              </h2>
+            </li>
+          `
+        )}
       </ol>
     `
   );

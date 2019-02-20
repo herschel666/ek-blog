@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 const { promisify } = require('util');
-const arc = require('@architect/functions');
 const slugify = require('slugify');
 
 const {
@@ -50,7 +49,7 @@ exports.getNiceDate = (dateStr) => {
 
 exports.slugify = slugify;
 
-exports.assets = (filename) => arc.http.helpers.url(`/assets/${filename}`);
+exports.assets = (filename) => `/assets/${filename}`;
 
 exports.writeFile = async ({ s3, buffer, filename, mime }) => {
   if (process.env.NODE_ENV === 'testing') {

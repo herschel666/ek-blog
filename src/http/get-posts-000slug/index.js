@@ -1,5 +1,4 @@
 const marked = require('marked');
-const arc = require('@architect/functions');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
 const {
@@ -30,7 +29,7 @@ const getBody = ({ title, content, createdAt, categories }) =>
           categories,
           ({ slug, title }, index) => html`
             ${index === 0 ? '' : ', '}
-            <a href="${arc.http.helpers.url(`/categories/${slug}`)}">
+            <a href="/categories/${slug}">
               ${title}
             </a>
           `

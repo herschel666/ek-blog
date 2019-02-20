@@ -1,5 +1,4 @@
 const marked = require('marked');
-const arc = require('@architect/functions');
 const data = require('@architect/data');
 const {
   BLOGPOSTS_PER_PAGE,
@@ -42,7 +41,7 @@ const printDbDump = (dump) => {
 const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
   layout(
     html`
-      <p><a href="${arc.http.helpers.url('/categories')}">All categories</a></p>
+      <p><a href="/categories">All categories</a></p>
       <hr />
       ${hasPosts
         ? html`
@@ -53,7 +52,7 @@ const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
                 html`
                   <div>
                     <h2>
-                      <a href="${arc.http.helpers.url(`/posts/${slug}`)}">
+                      <a href="/posts/${slug}">
                         ${title}
                       </a>
                     </h2>
@@ -70,14 +69,14 @@ const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
             <div>
               ${prevPage
                 ? html`
-                    <a href="${arc.http.helpers.url(`/?page=${prevPage}`)}">
+                    <a href="/?page=${prevPage}">
                       Prev page
                     </a>
                   `
                 : ''}
               ${nextPage
                 ? html`
-                    <a href="${arc.http.helpers.url(`/?page=${nextPage}`)}">
+                    <a href="/?page=${nextPage}">
                       Next page
                     </a>
                   `
