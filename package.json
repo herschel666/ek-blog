@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "server": "PROJECT_ROOT=\"$(echo $PWD)\" sandbox",
     "build": "NODE_ENV=production webpack",
     "watch": "webpack --watch",
     "clean:assets": "rm -rf ./src/http/get-assets-000file/files/*.{css,js}",
@@ -15,9 +16,15 @@
   "dependencies": {
     "@architect/architect": "^5.5.3",
     "@ek-blog/install-sharp-bindings": "file:./plugins/install-sharp-bindings",
+    "apollo-cache-inmemory": "^1.5.1",
+    "apollo-client": "^2.5.1",
     "bcryptjs": "^2.4.3",
+    "graphql": "^14.1.1",
+    "graphql-anywhere": "^4.2.1",
+    "graphql-tag": "^2.10.1",
     "marked": "^0.6.0",
     "prop-types": "^15.6.2",
+    "react-apollo": "^2.5.1",
     "slugify": "^1.3.4"
   },
   "devDependencies": {

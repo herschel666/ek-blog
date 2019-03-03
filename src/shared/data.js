@@ -1,14 +1,11 @@
 const data = require('@architect/data');
 const shortid = require('shortid');
 const { slugify } = require('./util');
+const { ALREADY_EXISTS_ERROR, NOT_FOUND_ERROR } = require('./constants');
 
 exports.BLOGPOSTS_PER_PAGE = 3;
 
 exports.MEDIA_PER_PAGE = 2;
-
-const CATEGORY_ALREADY_EXISTS = (exports.CATEGORY_ALREADY_EXISTS = Symbol());
-
-const TARGET_NOT_FOUND = (exports.TARGET_NOT_FOUND = Symbol());
 
 const getCategoryParamString = (categorySlugs) =>
   categorySlugs.reduce((params, slug) => `${params}cat:${slug}#`, '#');
@@ -242,6 +239,15 @@ exports.createBlogpost = async ({
     content,
     slug,
   });
+
+  return {
+    uid,
+    title,
+    content,
+    categories,
+    createdAt,
+    slug,
+  };
 };
 
 exports.updateBlogpost = async ({ uid, title, content, categories }) => {
@@ -255,7 +261,7 @@ exports.updateBlogpost = async ({ uid, title, content, categories }) => {
   ]);
 
   if (!createdAt) {
-    return TARGET_NOT_FOUND;
+    throw new Error(NOT_FOUND_ERROR);
   }
 
   const attributes = [
@@ -275,6 +281,19 @@ exports.updateBlogpost = async ({ uid, title, content, categories }) => {
       ':params': getBlogpostParams(createdAt, categorySlugs, uid),
       ':updatedAt': updatedAt,
     },
+  });
+
+  return exports.getBlogpostByUid({
+    values: [
+      'uid',
+      'createdAt',
+      'updatedAt',
+      'slug',
+      'title',
+      'content',
+      'categories',
+    ],
+    uid,
   });
 };
 
@@ -331,12 +350,11 @@ exports.getCategoryByUid = async ({ uid, values }) => {
 };
 
 exports.createCategory = async ({ title }) => {
-  console.log('Create category', title);
   const slug = slugify(title, { lower: true });
   const category = await exports.getCategoryBySlug({ slug, values: ['uid'] });
 
   if (category) {
-    return CATEGORY_ALREADY_EXISTS;
+    throw new Error(ALREADY_EXISTS_ERROR);
   }
 
   const createdAt = new Date().toISOString();
@@ -349,6 +367,13 @@ exports.createCategory = async ({ title }) => {
     title,
   };
   await data.blog.put(payload);
+
+  return {
+    createdAt,
+    uid,
+    slug,
+    title,
+  };
 };
 
 exports.updateCategory = async ({ uid, title }) => {
@@ -357,16 +382,23 @@ exports.updateCategory = async ({ uid, title }) => {
     uid,
   });
 
-  if (!createdAt) {
-    return TARGET_NOT_FOUND;
+  if (!category) {
+    throw new Error(NOT_FOUND_ERROR);
   }
 
+  const updatedAt = new Date().toISOString();
   await data.blog.update({
     Key: { kind: 'category', createdAt },
-    UpdateExpression: 'SET title = :title',
+    UpdateExpression: 'SET title = :title, updatedAt = :updatedAt',
     ExpressionAttributeValues: {
       ':title': title,
+      ':updatedAt': updatedAt,
     },
+  });
+
+  return exports.getCategoryByUid({
+    values: ['uid', 'slug', 'createdAt', 'updatedAt', 'title'],
+    uid,
   });
 };
 
@@ -394,7 +426,13 @@ exports.createMedia = async ({ filehash, ext, description }) => {
     ext,
   });
 
-  return createdAt;
+  return {
+    createdAt,
+    filehash,
+    description,
+    uid,
+    ext,
+  };
 };
 
 exports.getMediaByUid = async ({ uid, values }) => {

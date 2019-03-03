@@ -8,14 +8,14 @@ exports.handler = arc.middleware(withAuth, async (req) => {
 
   try {
     const media = await getMediaByUid({
-      values: ['uid', 'filehash', 'ext', 'description'],
+      values: ['uid', 'createdAt', 'filehash', 'ext', 'description'],
       uid: req.params.uid,
     });
     const status = media ? 200 : 404;
 
     return {
       type: 'application/json',
-      body: JSON.stringify(media),
+      body: JSON.stringify({ media }),
       status,
     };
   } catch (err) {

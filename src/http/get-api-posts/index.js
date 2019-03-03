@@ -18,20 +18,30 @@ exports.handler = arc.middleware(withAuth, async (req) => {
       kind: 'blogpost',
       offset,
     });
+    const values = [
+      'uid',
+      'slug',
+      'createdAt',
+      'updatedAt',
+      'content',
+      'title',
+      'categories',
+    ];
     const [{ items: posts = [], hasNextPage }, count] = await Promise.all([
       getPaginatedByKind({
         kind: 'blogpost',
-        values: ['uid', 'content', 'title', 'slug', 'createdAt'],
         limit: BLOGPOSTS_PER_PAGE,
+        values,
         startKey,
       }),
       getBlogpostsCount(),
     ]);
     const nextPage = hasNextPage ? currentPage + 1 : null;
+    const itemsPerPage = BLOGPOSTS_PER_PAGE;
 
     return {
       type: 'application/json',
-      body: JSON.stringify({ posts, count, nextPage }),
+      body: JSON.stringify({ posts, count, nextPage, itemsPerPage }),
     };
   } catch (err) {
     console.log(err);

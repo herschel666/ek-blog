@@ -24,6 +24,12 @@ slugify.extend({
   '!': '',
 });
 
+const MEDIA_FOLDER_PATH = path.resolve(
+  process.env.PROJECT_ROOT,
+  'public',
+  'media'
+);
+
 const pad = (num = 0, str = String(num)) => {
   const len = str.length;
   return len >= 2 ? str : `0${str}`;
@@ -53,12 +59,7 @@ exports.assets = (filename) => `/assets/${filename}`;
 
 exports.writeFile = async ({ s3, buffer, filename, mime }) => {
   if (process.env.NODE_ENV === 'testing') {
-    const filePath = path.resolve(
-      process.env.CURDIR,
-      'public',
-      'media',
-      filename
-    );
+    const filePath = path.resolve(MEDIA_FOLDER_PATH, filename);
     await writeFile(filePath, buffer);
   } else {
     await s3
@@ -76,7 +77,7 @@ exports.writeFile = async ({ s3, buffer, filename, mime }) => {
 
 exports.deleteFile = async (s3, filename) => {
   if (process.env.NODE_ENV === 'testing') {
-    await unlink(path.resolve(process.env.CURDIR, 'public', 'media', filename));
+    await unlink(path.resolve(MEDIA_FOLDER_PATH, filename));
   } else {
     await s3
       .deleteObject({

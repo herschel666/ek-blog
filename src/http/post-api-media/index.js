@@ -87,7 +87,8 @@ exports.handler = arc.middleware(withAuth, async (req) => {
       mime,
     });
 
-    const createdAt = await createMedia(payload);
+    const mediaElement = await createMedia(payload);
+    mediaElement.root = arc.http.helpers.static('/_static/media/');
 
     if (!isPdf) {
       await deferResizing({
@@ -97,7 +98,7 @@ exports.handler = arc.middleware(withAuth, async (req) => {
       });
       await arc.queues.publish({
         name: 'finish-image-upload',
-        payload: { filehash, createdAt },
+        payload: { filehash, createdAt: mediaElement.createdAt },
       });
     }
 
@@ -106,6 +107,7 @@ exports.handler = arc.middleware(withAuth, async (req) => {
       type: 'application/json',
       body: JSON.stringify({
         type: 'successs',
+        body: { media: mediaElement },
       }),
     };
   } catch (err) {

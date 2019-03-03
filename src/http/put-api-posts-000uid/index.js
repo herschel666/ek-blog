@@ -6,7 +6,7 @@ const {
   getBlogpostCheck,
   getErrorType,
 } = require('@architect/shared/validate');
-const { TARGET_NOT_FOUND, updateBlogpost } = require('@architect/shared/data');
+const { updateBlogpost } = require('@architect/shared/data');
 const {
   SERVER_ERROR,
   NOT_FOUND_ERROR,
@@ -41,28 +41,22 @@ exports.handler = arc.middleware(withAuth, async (req) => {
   }
 
   try {
-    const notFoundError = new Error(NOT_FOUND_ERROR);
-
     // No need to hit the DB when invalid Uid given.
     if (!uid.startsWith('b') || uid.length !== 10) {
-      throw notFoundError;
+      throw new Error(NOT_FOUND_ERROR);
     }
 
-    const result = await updateBlogpost({
+    const post = await updateBlogpost({
       uid,
       title,
       content,
       categories,
     });
 
-    if (result === TARGET_NOT_FOUND) {
-      throw notFoundError;
-    }
-
     return {
       status: 200,
       type: 'application/json',
-      body: JSON.stringify({ type: 'success' }),
+      body: JSON.stringify({ type: 'success', body: { post } }),
     };
   } catch (err) {
     console.log(err);

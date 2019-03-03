@@ -8,7 +8,7 @@ exports.handler = arc.middleware(withAuth, async (req) => {
 
   try {
     const categories = await getCategories({
-      values: ['uid', 'title'],
+      values: ['uid', 'createdAt', 'updatedAt', 'title', 'slug'],
     });
 
     return {

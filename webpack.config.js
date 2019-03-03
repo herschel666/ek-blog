@@ -125,6 +125,7 @@ const config = {
   externals: {
     react: 'React',
     'react-dom': 'ReactDOM',
+    'react-dom/server': 'ReactDOMServer',
     'react-router-dom': 'ReactRouterDOM',
     'react-ace': 'ReactAce',
   },

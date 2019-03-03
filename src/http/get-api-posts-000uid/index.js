@@ -8,14 +8,22 @@ exports.handler = arc.middleware(withAuth, async (req) => {
 
   try {
     const post = await getBlogpostByUid({
-      values: ['uid', 'title', 'content', 'categories'],
+      values: [
+        'uid',
+        'createdAt',
+        'updatedAt',
+        'slug',
+        'title',
+        'content',
+        'categories',
+      ],
       uid: req.params.uid,
     });
     const status = post ? 200 : 404;
 
     return {
       type: 'application/json',
-      body: JSON.stringify(post),
+      body: JSON.stringify({ post }),
       status,
     };
   } catch (err) {

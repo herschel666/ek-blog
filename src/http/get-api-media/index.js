@@ -38,6 +38,7 @@ exports.handler = arc.middleware(withAuth, async (req) => {
           ext,
           uid,
         })),
+        itemsPerPage: MEDIA_PER_PAGE,
         nextPage,
       }),
     };

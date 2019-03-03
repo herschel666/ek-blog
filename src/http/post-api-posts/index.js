@@ -31,18 +31,26 @@ exports.handler = arc.middleware(withAuth, async (req) => {
       type: 'application/json',
       body: JSON.stringify({
         type: VALIDATION_ERROR,
-        body: { errors: result },
+        body: {
+          errors: result.map(({ field, message }) => ({ field, message })),
+        },
       }),
     };
   }
 
   try {
-    await createBlogpost({
+    const post = await createBlogpost({
       title,
       content,
       categories,
       createdAt,
     });
+
+    return {
+      status: 200,
+      type: 'application/json',
+      body: JSON.stringify({ type: 'success', body: { post } }),
+    };
   } catch (err) {
     console.log(err);
 
@@ -58,10 +66,4 @@ exports.handler = arc.middleware(withAuth, async (req) => {
       body: JSON.stringify({ type: SERVER_ERROR, body: { errors } }),
     };
   }
-
-  return {
-    status: 200,
-    type: 'application/json',
-    body: JSON.stringify({ type: 'success' }),
-  };
 });

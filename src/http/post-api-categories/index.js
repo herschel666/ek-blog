@@ -1,14 +1,8 @@
 const arc = require('@architect/functions');
 const sanitizeHtml = require('sanitize-html');
 const withAuth = require('@architect/shared/middlewares/with-auth');
-const {
-  CATEGORY_ALREADY_EXISTS,
-  createCategory,
-} = require('@architect/shared/data');
-const {
-  SERVER_ERROR,
-  ALREADY_EXISTS_ERROR,
-} = require('@architect/shared/constants');
+const { createCategory } = require('@architect/shared/data');
+const { SERVER_ERROR } = require('@architect/shared/constants');
 const {
   getCategoryCheck,
   getCategoryErrorMessage,
@@ -27,16 +21,12 @@ exports.handler = arc.middleware(withAuth, async (req) => {
   try {
     check({ title });
 
-    const result = await createCategory({ title });
-
-    if (result === CATEGORY_ALREADY_EXISTS) {
-      throw new Error(ALREADY_EXISTS_ERROR);
-    }
+    const category = await createCategory({ title });
 
     return {
       status: 200,
       type: 'application/json',
-      body: JSON.stringify({ type: 'success' }),
+      body: JSON.stringify({ type: 'success', body: { category } }),
     };
   } catch (err) {
     console.log(err);
