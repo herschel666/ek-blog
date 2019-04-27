@@ -1,8 +1,8 @@
 {
   "name": "blog-put-api-categories-000uid",
   "dependencies": {
-    "@architect/data": "^2.0.13",
-    "@architect/functions": "^1.12.1",
-    "sanitize-html": "^1.20.0"
+    "@architect/data": "^2.0.17",
+    "@architect/functions": "^3.0.5",
+    "sanitize-html": "^1.20.1"
   }
 }
