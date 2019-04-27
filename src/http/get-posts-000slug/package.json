@@ -1,8 +1,8 @@
 {
   "name": "blog-get-posts-000slug",
   "dependencies": {
-    "@architect/data": "^2.0.9",
-    "@architect/functions": "^1.12.1",
-    "marked": "^0.6.0"
+    "@architect/data": "^2.0.17",
+    "@architect/functions": "^3.0.5",
+    "marked": "^0.6.2"
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "blog-get-api-media",
   "dependencies": {
-    "@architect/data": "^2.0.13",
-    "@architect/functions": "^1.12.1"
+    "@architect/data": "^2.0.17",
+    "@architect/functions": "^3.0.5"
   }
 }
