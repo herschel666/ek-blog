@@ -163,7 +163,6 @@ exports.getBlogpostsCount = async () => {
   try {
     const { Count: count } = await data.blog.query({
       KeyConditionExpression: 'kind = :kind',
-      ProjectionExpression: 'uid',
       ExpressionAttributeValues: {
         ':kind': 'blogpost',
       },
