@@ -24,11 +24,8 @@ slugify.extend({
   '!': '',
 });
 
-const MEDIA_FOLDER_PATH = path.resolve(
-  process.env.PROJECT_ROOT,
-  'public',
-  'media'
-);
+const { PROJECT_ROOT = '' } = process.env;
+const MEDIA_FOLDER_PATH = path.resolve(PROJECT_ROOT, 'public', 'media');
 
 const pad = (num = 0, str = String(num)) => {
   const len = str.length;
