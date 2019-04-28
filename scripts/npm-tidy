@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+function npm_tidy () {
+  npm dedupe
+  rm -rf ./node_modules
+  mkdir ./node_modules
+  touch ./node_modules/.metadata_never_index
+  npm i
+}
+
+PATHS=(
+  "src/shared"
+  "src/views"
+)
+
+while IFS= read -r -d $'\0'; do
+    PATHS+=("$REPLY")
+done < <(find src/{http,queues} -mindepth 1 -maxdepth 1 -type d -print0)
+
+echo "Tidying $(pwd)..."
+npm_tidy
+
+for path in "${PATHS[@]}"
+do
+  fullpath="$(pwd)/$path/"
+  cd $fullpath
+  if [[ -f "$fullpath/package.json" && -w "$fullpath/package-lock.json" ]]; then
+    echo "Tidying $fullpath..."
+    npm_tidy
+  fi
+  cd - > /dev/null
+done

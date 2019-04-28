@@ -3,5 +3,6 @@
   "dependencies": {
     "@architect/data": "^2.0.17",
     "@architect/functions": "^3.0.5"
-  }
+  },
+  "devDependencies": {}
 }

@@ -1,22 +1,17 @@
-const marked = require('marked');
+const remark = require('remark');
+const remarkHtml = require('remark-html');
+const visit = require('unist-util-visit');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
-const {
-  extendMarkdownRenderer,
-  getMarkedOptions,
-} = require('@architect/views/markdown');
+const getMarkdownRenderer = require('@architect/views/markdown');
 const { getBlogpostBySlug } = require('@architect/shared/data');
 const { getNiceDate } = require('@architect/shared/util');
 const { iterate } = require('@architect/views/util');
 const get404 = require('@architect/views/partials/get-404');
 
-marked.setOptions(
-  getMarkedOptions({
-    renderer: extendMarkdownRenderer(new marked.Renderer()),
-  })
-);
+const markdown = getMarkdownRenderer(remark, remarkHtml, visit);
 
-const getBody = ({ title, content, createdAt, categories }) =>
+const getBody = async ({ title, content, createdAt, categories }) =>
   layout(
     `"${title}"`,
     html`
@@ -35,7 +30,7 @@ const getBody = ({ title, content, createdAt, categories }) =>
           `
         )}
       </strong>
-      ${marked(content)}
+      ${await markdown(content)}
     `
   );
 
@@ -47,7 +42,7 @@ exports.handler = async (req) => {
     slug: req.params.slug,
     values: ['title', 'content', 'createdAt', 'categories'],
   });
-  const body = blogpost ? getBody(blogpost) : get404();
+  const body = blogpost ? await getBody(blogpost) : get404();
   const status = blogpost ? 200 : 404;
 
   return {

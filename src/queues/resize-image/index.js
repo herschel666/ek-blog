@@ -26,9 +26,20 @@ const getInstanceAndMeta = async (filehash, buffer) => {
   return cache[filehash];
 };
 
+const finalize = async (finish, payload) => {
+  if (!finish) {
+    return;
+  }
+
+  await arc.queues.publish({
+    name: 'finish-image-upload',
+    payload,
+  });
+};
+
 const handler = async (record, callback) => {
   let error;
-  const { filename, media, size, mime } = record;
+  const { filename, createdAt, media, size, mime, finish } = record;
   const buffer = new Buffer(media, 'base64');
   const [filehash, ext] = filename.split('.');
   const dimensions = IMAGE_SIZES[size];
@@ -54,12 +65,15 @@ const handler = async (record, callback) => {
       .toFormat(ext)
       .toBuffer();
 
-    await writeFile({
-      s3: new S3(),
-      buffer: resized,
-      filename: `${filehash}-${size}.${ext}`,
-      mime,
-    });
+    await Promise.all([
+      writeFile({
+        s3: new S3(),
+        buffer: resized,
+        filename: `${filehash}-${size}.${ext}`,
+        mime,
+      }),
+      finalize(finish, { filehash, createdAt, width, height }),
+    ]);
   } catch (err) {
     error = err;
   }

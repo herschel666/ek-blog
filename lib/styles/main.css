@@ -11,3 +11,8 @@ body {
 .site-title {
   font-size: 2em;
 }
+
+[data-lazy-src]::before {
+  display: block;
+  content: '';
+}

@@ -22,7 +22,7 @@ exports.handler = arc.middleware(withAuth, async (req) => {
     });
     const { items: media = [], hasNextPage } = await getPaginatedByKind({
       kind: 'media',
-      values: ['uid', 'filehash', 'ext', 'description'],
+      values: ['uid', 'filehash', 'ext', 'description', 'width', 'height'],
       limit,
       startKey,
     });
@@ -31,13 +31,23 @@ exports.handler = arc.middleware(withAuth, async (req) => {
     return {
       type: 'application/json',
       body: JSON.stringify({
-        media: media.map(({ uid, filehash, ext, description = '' }) => ({
-          root: arc.http.helpers.static('/_static/media/'),
-          description,
-          filehash,
-          ext,
-          uid,
-        })),
+        media: media.map(
+          ({
+            uid,
+            filehash,
+            ext,
+            description = '',
+            width = 0,
+            height = 0,
+          }) => ({
+            description,
+            filehash,
+            width,
+            height,
+            ext,
+            uid,
+          })
+        ),
         itemsPerPage: MEDIA_PER_PAGE,
         nextPage,
       }),

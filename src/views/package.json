@@ -1,0 +1,6 @@
+{
+  "name": "blog-views",
+  "dependencies": {
+    "is-absolute-url": "^3.0.0"
+  }
+}

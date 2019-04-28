@@ -7,8 +7,16 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const { NODE_ENV = 'testing' } = process.env; // Mimic the @architect behaviour.
 const DEV = NODE_ENV !== 'production';
 const PROD = NODE_ENV === 'production';
-const DIST_FOLDER = path.join('src', 'http', 'get-assets-000file', 'files');
-const LIB_FOLDER = path.join(__dirname, 'lib', 'scripts');
+const DIST_FOLDER = path.join(
+  __dirname,
+  'src',
+  'http',
+  'get-assets-000file',
+  'files'
+);
+const LIB_FOLDER = path.join(__dirname, 'lib');
+const SCRIPTS_FOLDER = path.join(LIB_FOLDER, 'scripts');
+const STYLES_FOLDER = path.join(LIB_FOLDER, 'styles');
 
 const LAYOUT_BANNER = `/*###################################################
 #                                                   #
@@ -18,12 +26,8 @@ const LAYOUT_BANNER = `/*###################################################
 #                                                   #
 ###################################################*/`;
 
-const jsFileName = DEV
-  ? `${DIST_FOLDER}/main.js`
-  : `${DIST_FOLDER}/[name].[chunkhash:6].js`;
-const cssFileName = DEV
-  ? `${DIST_FOLDER}/main.css`
-  : `${DIST_FOLDER}/[name].[chunkhash:6].css`;
+const jsFileName = DEV ? `[name].js` : `[name].[chunkhash:6].js`;
+const cssFileName = DEV ? `[name].css` : `[name].[chunkhash:6].css`;
 const mode = DEV ? 'development' : 'production';
 
 const optimization = {
@@ -53,6 +57,7 @@ const optimization = {
 
 const babelPlugins = [
   '@babel/plugin-proposal-class-properties',
+  '@babel/plugin-syntax-dynamic-import',
   [
     '@babel/plugin-transform-runtime',
     {
@@ -76,14 +81,16 @@ const config = {
 
   devtool: 'cheap-module-eval-source-map',
 
-  entry: [
-    path.resolve(LIB_FOLDER, 'admin', 'index.js'),
-    path.resolve(LIB_FOLDER, 'admin', 'main.css'),
-  ],
+  entry: {
+    admin: path.resolve(SCRIPTS_FOLDER, 'admin', 'index.js'),
+    main: path.resolve(STYLES_FOLDER, 'main.css'),
+    blog: path.resolve(SCRIPTS_FOLDER, 'blog', 'index.js'),
+  },
 
   output: {
     filename: jsFileName,
-    path: __dirname,
+    path: DIST_FOLDER,
+    publicPath: '/assets/',
   },
 
   module: {
@@ -101,22 +108,43 @@ const config = {
       },
       {
         test: /\.css$/,
-        use: [
+        oneOf: [
           {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: '../',
-            },
+            test: /lib\/styles\//,
+            use: [
+              {
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                  publicPath: '../',
+                },
+              },
+              {
+                loader: 'css-loader',
+                options: { importLoaders: 1 },
+              },
+              'postcss-loader',
+            ],
           },
           {
-            loader: 'css-loader',
-            options: {
-              modules: true,
-              localIdentName: '[hash:base64:8]',
-              importLoaders: 1,
-            },
+            test: /lib\/scripts\//,
+            use: [
+              {
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                  publicPath: '../',
+                },
+              },
+              {
+                loader: 'css-loader',
+                options: {
+                  modules: true,
+                  localIdentName: '[hash:base64:8]',
+                  importLoaders: 1,
+                },
+              },
+              'postcss-loader',
+            ],
           },
-          'postcss-loader',
         ],
       },
     ],
@@ -135,7 +163,7 @@ const config = {
       filename: cssFileName,
     }),
     new HtmlWebpackPlugin({
-      filename: 'src/views/layouts/admin.js',
+      filename: '../../../views/layouts/admin.js',
       template: path.resolve(
         __dirname,
         path.join('lib', 'layout', 'admin.ejs')
@@ -144,7 +172,7 @@ const config = {
       LAYOUT_BANNER,
     }),
     new HtmlWebpackPlugin({
-      filename: 'src/views/layouts/blog.js',
+      filename: '../../../views/layouts/blog.js',
       template: path.resolve(__dirname, path.join('lib', 'layout', 'blog.ejs')),
       inject: false,
       LAYOUT_BANNER,
