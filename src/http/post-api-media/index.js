@@ -18,13 +18,14 @@ const {
   VALIDATION_ERROR,
 } = require('@architect/shared/constants');
 
-const sizes = [IMAGE_SIZE_THUMB, IMAGE_SIZE_S, IMAGE_SIZE_M, IMAGE_SIZE_L];
+const sizes = [IMAGE_SIZE_L, IMAGE_SIZE_M, IMAGE_SIZE_S, IMAGE_SIZE_THUMB];
 
 const deferResizing = (args) =>
   sizes.reduce(async (promise, size) => {
     await promise;
 
-    const payload = Object.assign({ size }, args);
+    const finish = size === IMAGE_SIZE_THUMB;
+    const payload = Object.assign({ size, finish }, args);
 
     return arc.queues.publish({
       name: 'resize-image',
@@ -88,17 +89,14 @@ exports.handler = arc.middleware(withAuth, async (req) => {
     });
 
     const mediaElement = await createMedia(payload);
-    mediaElement.root = arc.http.helpers.static('/_static/media/');
+    mediaElement.root = arc.http.helpers.static('/media/');
 
     if (!isPdf) {
       await deferResizing({
+        createdAt: mediaElement.createdAt,
         media,
         filename,
         mime,
-      });
-      await arc.queues.publish({
-        name: 'finish-image-upload',
-        payload: { filehash, createdAt: mediaElement.createdAt },
       });
     }
 

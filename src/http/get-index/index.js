@@ -1,5 +1,6 @@
-const marked = require('marked');
-const data = require('@architect/data');
+const remark = require('remark');
+const remarkHtml = require('remark-html');
+const visit = require('unist-util-visit');
 const {
   BLOGPOSTS_PER_PAGE,
   getPaginatedByKind,
@@ -9,36 +10,34 @@ const {
 const { getNiceDate } = require('@architect/shared/util');
 const layout = require('@architect/views/layouts/blog');
 const html = require('@architect/views/html');
-const {
-  extendMarkdownRenderer,
-  getMarkedOptions,
-} = require('@architect/views/markdown');
+const getMarkdownRenderer = require('@architect/views/markdown');
 const { iterate } = require('@architect/views/util');
 
-marked.setOptions(
-  getMarkedOptions({
-    renderer: extendMarkdownRenderer(new marked.Renderer()),
-  })
-);
+const markdown = getMarkdownRenderer(remark, remarkHtml, visit);
 
-const printDbDump = (dump) => {
-  if (process.env.NODE_ENV === 'testing') {
-    return html`
-      <hr />
-      <details>
-        <summary>Rohdaten</summary>
-        <pre>
+const printDbDump = async () => {
+  if (process.env.NODE_ENV !== 'testing') {
+    return '';
+  }
+
+  const data = require('@architect/data');
+  const raw = await data.blog.scan({});
+  const dump = JSON.stringify(raw, null, 2);
+
+  return html`
+    <hr />
+    <details>
+      <summary>DDB Dump</summary>
+      <pre>
           <code>
-            ${dump}
+${dump}
           </code>
         </pre>
-      </details>
-    `;
-  }
-  return '';
+    </details>
+  `;
 };
 
-const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
+const getBody = async ({ posts, hasPosts, prevPage, nextPage }) =>
   layout(
     html`
       <p><a href="/categories">All categories</a></p>
@@ -62,7 +61,7 @@ const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
                         ${getNiceDate(createdAt)}
                       </time>
                     </strong>
-                    ${marked(content)}
+                    ${content}
                   </div>
                 `
             )}
@@ -86,7 +85,7 @@ const getBody = ({ posts, hasPosts, prevPage, nextPage, raw }) =>
         : html`
             <h1>Es gibt noch keine Beiträge.</h1>
           `}
-      ${printDbDump(raw)}
+      ${await printDbDump()}
     `
   );
 
@@ -101,9 +100,8 @@ exports.handler = async (req) => {
     offset,
   });
   const [
-    { items: posts = [], hasNextPage },
+    { items: rawPosts = [], hasNextPage },
     blogpostCount,
-    raw,
   ] = await Promise.all([
     getPaginatedByKind({
       kind: 'blogpost',
@@ -112,8 +110,14 @@ exports.handler = async (req) => {
       startKey,
     }),
     getBlogpostsCount(),
-    data.blog.scan({}),
   ]);
+  const posts = await Promise.all(
+    rawPosts.map(async (post) =>
+      Object.assign(post, {
+        content: await markdown(post.content),
+      })
+    )
+  );
   const prevPage = offset === 0 ? null : currentPage - 1;
   const nextPage =
     hasNextPage && offset + BLOGPOSTS_PER_PAGE < blogpostCount
@@ -121,12 +125,11 @@ exports.handler = async (req) => {
       : null;
   const hasPosts = posts.length && offset <= blogpostCount;
   const status = hasPosts || typeof req.query.page === 'undefined' ? 200 : 404;
-  const body = getBody({
+  const body = await getBody({
     posts,
     hasPosts,
     prevPage,
     nextPage,
-    raw: JSON.stringify(raw, null, 2),
   });
 
   return {

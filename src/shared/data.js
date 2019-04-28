@@ -451,12 +451,14 @@ exports.getMediaByUid = async ({ uid, values }) => {
   return media || null;
 };
 
-exports.finishImageUpload = async ({ filehash, createdAt }) => {
+exports.finishImageUpload = async ({ filehash, createdAt, width, height }) => {
   await data.blog.update({
     Key: { kind: 'media', createdAt },
-    UpdateExpression: `SET filehash = :filehash`,
+    UpdateExpression: `SET filehash = :filehash, width = :width, height = :height`,
     ExpressionAttributeValues: {
       ':filehash': filehash,
+      ':width': width,
+      ':height': height,
     },
   });
 };
